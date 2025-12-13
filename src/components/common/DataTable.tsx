@@ -1,4 +1,3 @@
-// components/data-table.tsx
 import { useState, useMemo } from "react";
 import {
   Table,
@@ -88,25 +87,12 @@ export function DataTable<TData extends Record<string, any>>({
       selectedRows.has(pageIndex * pageSize + idx)
     );
 
-  const isSomePageSelected =
-    paginatedData.some((_, idx) =>
-      selectedRows.has(pageIndex * pageSize + idx)
-    ) && !isAllPageSelected;
-
   return (
     <div className="space-y-4 min-w-xl">
-      {/* Üst bilgi: seçilen satır sayısı + sayfa başına satır */}
-
-      <p className="text-sm text-muted-foreground">
-        {selectedCount} satır seçildi
-      </p>
-
-      {/* Tablo */}
       <div className="rounded-md border">
         <Table>
           <TableHeader className="bg-[#f6f3f3]">
             <TableRow>
-              {/* Başlık checkbox */}
               <TableHead className="w-12">
                 <Checkbox
                   checked={isAllPageSelected}
@@ -132,7 +118,6 @@ export function DataTable<TData extends Record<string, any>>({
                     key={globalIndex}
                     data-state={isSelected && "selected"}
                   >
-                    {/* Satır checkbox */}
                     <TableCell>
                       <Checkbox
                         checked={isSelected}
@@ -141,7 +126,6 @@ export function DataTable<TData extends Record<string, any>>({
                       />
                     </TableCell>
 
-                    {/* Diğer sütunlar */}
                     {columns.map((col) => (
                       <TableCell key={String(col.key)}>
                         {col.render ? col.render(row) : row[col.key]}
@@ -164,7 +148,6 @@ export function DataTable<TData extends Record<string, any>>({
         </Table>
       </div>
 
-      {/* Pagination */}
       <div className="flex items-center justify-between">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

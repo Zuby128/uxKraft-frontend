@@ -1,6 +1,7 @@
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetTitle,
@@ -9,27 +10,27 @@ import { useRightSidebarStore } from "@/store/RightSidebarStore";
 import { Button } from "../ui/button";
 
 function RightSidebar() {
-  const { isOpen, title, content, extraButton, closeBar } =
+  const { isOpen, title, content, description, extraButton, closeBar } =
     useRightSidebarStore();
 
   return (
     <Sheet open={isOpen} onOpenChange={(o) => (o ? isOpen : closeBar())}>
       <SheetContent className="!min-w-[300px] md:!min-w-[450px] w-full md:w-fit !max-w-[600px] p-4 h-screen overflow-y-auto overflow-x-hidden">
-        <SheetHeader>
-          <SheetTitle>
-            {title} <span className="text-sm underline ml-4">Edit</span>
-          </SheetTitle>
+        <SheetHeader className="!px-0">
+          <SheetTitle>{title}</SheetTitle>
+          <SheetDescription>{description}</SheetDescription>
         </SheetHeader>
+
         <div className="w-full h-full">{content}</div>
-        <SheetFooter className="flex flex-end flex-nowrap">
-          {extraButton && (
-            <Button onClick={extraButton.onClick} variant="default">
-              {extraButton.text}
-            </Button>
-          )}
+        <SheetFooter className="!flex !flex-row !flex-nowrap gap-2 !px-0">
           {extraButton && (
             <Button variant="outline" onClick={closeBar}>
               Close
+            </Button>
+          )}
+          {extraButton && (
+            <Button onClick={extraButton.onClick} variant="default">
+              {extraButton.text}
             </Button>
           )}
         </SheetFooter>

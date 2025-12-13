@@ -104,7 +104,15 @@ function Individual() {
       <DataTable columns={columns} data={users} />
       <div>
         <Button
-          onClick={() => openBar("Item Name #003", <IndividualItemDetails />)}
+          onClick={() =>
+            openBar(
+              <>
+                "Item Name #003"{" "}
+                <span className="text-sm underline ml-4">Edit</span>
+              </>,
+              <IndividualItemDetails />
+            )
+          }
         >
           open
         </Button>
