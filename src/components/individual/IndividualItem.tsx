@@ -22,7 +22,7 @@ function IndividualItem() {
   };
 
   return (
-    <div className="w-full px-4 pb-4 text-sm bg-white">
+    <div className="w-full px-4 pb-4 text-sm bg-white ">
       <Table className="text-sm">
         <TableBody>
           {/* Satır 1 */}
@@ -103,7 +103,7 @@ function IndividualItem() {
         </TableHeader>
         <TableBody>
           <TableRow>
-            <TableCell className="w-[200px] !line-clamp-2 !text-wrap">
+            <TableCell className="w-[200px] !text-wrap !line-clamp-2 ">
               Brand Harmony Lorem ipsum dolor sit amet consectetur adipisicing.
             </TableCell>
             <TableCell>$2.000,00</TableCell>

@@ -103,6 +103,17 @@ body {
   }
 }
 
+.stripped table {
+  font-size: 12px !important;
+}
 thead {
   background: #f6f3f3 !important;
+}
+.stripped th,
+.stripped td {
+  border-right: 1px solid #e5e5e5;
+}
+.stripped th:first-child,
+.stripped td:first-child {
+  border-right: none;
 }

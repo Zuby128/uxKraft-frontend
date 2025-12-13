@@ -13,8 +13,8 @@ import { Button } from "../ui/button";
 
 function TableSearch() {
   return (
-    <div className="grid grid-cols-12 items-center w-full max-w-3xl mb-4 gap-2">
-      <div className="relative w-full max-w-sm col-span-7">
+    <div className="grid grid-cols-12 items-center w-full max-w-5xl mb-4 gap-2">
+      <div className="relative w-full col-span-7">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           type="search"
@@ -48,7 +48,7 @@ function TableSearch() {
           </SelectContent>
         </Select>
       </div>
-      <Button variant="ghost" className="!p-0 !m-0" type="button">
+      <Button variant="ghost" size="icon-lg" className="w-full" type="button">
         <FileDown className="!w-8 !h-8" />
       </Button>
     </div>

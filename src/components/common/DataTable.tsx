@@ -88,8 +88,8 @@ export function DataTable<TData extends Record<string, any>>({
     );
 
   return (
-    <div className="space-y-4 min-w-xl">
-      <div className="rounded-md border">
+    <div className="space-y-4 min-w-xl text-xs">
+      <div className="rounded-md border stripped">
         <Table>
           <TableHeader className="bg-[#f6f3f3]">
             <TableRow>
@@ -122,7 +122,7 @@ export function DataTable<TData extends Record<string, any>>({
                       <Checkbox
                         checked={isSelected}
                         onCheckedChange={() => toggleRow(globalIndex)}
-                        aria-label="Satırı seç"
+                        aria-label="select row"
                       />
                     </TableCell>
 
@@ -189,7 +189,7 @@ export function DataTable<TData extends Record<string, any>>({
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          {range(data.length / pageSize < 1 ? 1 : data.length / pageSize).map(
+          {range(pageSize / data.length < 1 ? 1 : data.length / pageSize).map(
             (v) => (
               <Button
                 key={`v${v}`}

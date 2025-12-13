@@ -11,11 +11,15 @@ import {
 } from "@/components/ui/tooltip";
 
 function DashboardContent({ children }: { children: ReactNode }) {
-  const { open } = useSidebar();
+  const { open, isMobile } = useSidebar();
   const { logout } = useAuthStore();
-  console.log(open);
+
   return (
-    <div className={open ? "w-[calc(100vw_-_255px)]" : "w-screen"}>
+    <div
+      className={
+        isMobile ? "w-screen" : open ? "w-[calc(100vw_-_255px)]" : "w-screen"
+      }
+    >
       <div className="w-full bg-gray-500 py-2 px-4 flex justify-between">
         <SidebarTrigger className="text-gray-300" />
         <Tooltip>
