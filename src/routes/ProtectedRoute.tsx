@@ -13,12 +13,20 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 }) => {
   const { user, token } = useAuthStore();
 
+  // Auth check - ama bu zaten App.tsx'de yapılıyor
   if (!token || !user) {
     return <Navigate to="/login" replace />;
   }
 
-  if (!allowedRoles.includes(user?.role as string)) {
-    return <Navigate to="/dashboard" replace />;
+  // Role check
+  if (!allowedRoles.includes(user.role as string)) {
+    // Sonsuz loop olmaması için farklı bir sayfaya yönlendir
+    return (
+      <div className="p-8">
+        <h1 className="text-2xl font-bold text-red-600">Access Denied</h1>
+        <p>You don't have permission to access this page.</p>
+      </div>
+    );
   }
 
   return <>{children}</>;

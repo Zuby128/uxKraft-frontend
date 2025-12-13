@@ -13,7 +13,7 @@ interface AuthStore {
 }
 
 const USER_EMAIL = "test@email.com";
-const USER_PASSWORD = "z123456";
+const USER_PASSWORD = "123456";
 
 const TOKEN = "APP_TOKEN";
 const USER = "APP_USER";
@@ -41,7 +41,12 @@ const useAuthStore = create<AuthStore>((set) => ({
       set({ token: "mockup_token" });
       set({ user: { email: USER_EMAIL, role: UserRole.user } });
       window.localStorage.setItem(TOKEN, "mockup_token");
-      window.localStorage.setItem(USER, JSON.stringify({ email: USER_EMAIL }));
+      window.localStorage.setItem(
+        USER,
+        JSON.stringify({ email: USER_EMAIL, role: UserRole.user })
+      );
+    } else {
+      throw new Error("email or password not matched");
     }
   },
   initial: () => {
