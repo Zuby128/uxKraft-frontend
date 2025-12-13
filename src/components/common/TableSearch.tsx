@@ -13,37 +13,41 @@ import { Button } from "../ui/button";
 
 function TableSearch() {
   return (
-    <div className="flex flex-nowrap items-center w-full max-w-3xl mb-4 gap-2">
-      <div className="relative w-full max-w-sm ">
+    <div className="grid grid-cols-12 items-center w-full max-w-3xl mb-4 gap-2">
+      <div className="relative w-full max-w-sm col-span-7">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           type="search"
-          placeholder="Ara..."
+          placeholder="Find by item Name, Item # or Spec #"
           className="pl-10" // Icon için sol padding
         />
       </div>
-      <Select>
-        <SelectTrigger className="!w-1/4 max-w-64">
-          <SelectValue placeholder="Phase" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectLabel>Phase</SelectLabel>
-            <SelectItem value="apple">01</SelectItem>
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-      <Select>
-        <SelectTrigger className="!w-1/4 max-w-64">
-          <SelectValue placeholder="Vendor" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectLabel>Vendor</SelectLabel>
-            <SelectItem value="apple">test vendor</SelectItem>
-          </SelectGroup>
-        </SelectContent>
-      </Select>
+      <div className="col-span-2">
+        <Select>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Phase" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Phase</SelectLabel>
+              <SelectItem value="apple">01</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="col-span-2">
+        <Select>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Vendor" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Vendor</SelectLabel>
+              <SelectItem value="apple">test vendor</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
       <Button variant="ghost" className="!p-0 !m-0" type="button">
         <FileDown className="!w-8 !h-8" />
       </Button>

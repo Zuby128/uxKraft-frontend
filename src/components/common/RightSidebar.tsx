@@ -25,7 +25,7 @@ function RightSidebar() {
         <SheetFooter className="!flex !flex-row !flex-nowrap gap-2 !px-0">
           {extraButton && (
             <Button variant="outline" onClick={closeBar}>
-              Close
+              Cancel
             </Button>
           )}
           {extraButton && (

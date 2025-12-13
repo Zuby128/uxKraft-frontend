@@ -12,7 +12,7 @@ import { Textarea } from "../ui/textarea";
 
 function UpdateTracking() {
   return (
-    <>
+    <div className="flex flex-col gap-4">
       {/* ------------ planning & requirements --------------- */}
       <div className="p-4 bg-white">
         <div className="font-bold mb-4">Planning & Requirements</div>
@@ -199,7 +199,7 @@ function UpdateTracking() {
           <Textarea placeholder="Delicate product" rows={5} />
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
