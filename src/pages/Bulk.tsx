@@ -1,3 +1,5 @@
+import BulkEdit from "@/components/bulk/BulkEdit";
+import UpdateTracking from "@/components/bulk/UpdateTracking";
 import { DataTable } from "@/components/common/DataTable";
 import { EditTable } from "@/components/common/EditTable";
 import TableSearch from "@/components/common/TableSearch";
@@ -7,15 +9,21 @@ import { useOrderItemsStore } from "@/store/orderItems.store";
 import { useVendorsStore } from "@/store/vendorsStore";
 import { exportToCsv } from "@/utils/export-to-csv";
 import { mapOrderItemsToCsv } from "@/utils/json-to-csv";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 function Bulk() {
   const { openBar } = useRightSidebarStore();
   const phase = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+  const [orderItemIds, setOrderItemIds] = useState<number[]>([]);
 
-  const { selectItem } = useOrderItemStore();
-
-  const { items, loading, search, fetchAll } = useOrderItemsStore();
+  const {
+    items,
+    loading,
+    search,
+    fetchAll,
+    setSelectedItemIds,
+    selectedItemIds,
+  } = useOrderItemsStore();
 
   const { vendors, fetchVendors } = useVendorsStore();
 
@@ -79,8 +87,33 @@ function Bulk() {
     [openBar]
   );
 
-  const onBulkEdit = () => {};
-  const onUpdateTracking = () => {};
+  const onSelectedElements = (idx: number[]) => {
+    setOrderItemIds(idx);
+    setSelectedItemIds(idx);
+  };
+
+  const onBulkEdit = () => {
+    openBar(
+      "Bulk Edit",
+      <BulkEdit />,
+      `${selectedItemIds.length} items selected`,
+      {
+        text: "Save Changes",
+        onClick: () => {},
+      }
+    );
+  };
+  const onUpdateTracking = () => {
+    openBar(
+      "Update Tracking",
+      <UpdateTracking />,
+      `${selectedItemIds.length} items selected`,
+      {
+        text: "Save Changes",
+        onClick: () => {},
+      }
+    );
+  };
   const onCreatePO = () => {};
   const onDelete = () => {};
 
@@ -99,7 +132,12 @@ function Bulk() {
         onCreatePO={onCreatePO}
         onDelete={onDelete}
       />
-      <DataTable columns={columns} data={items} selectable={true} />
+      <DataTable
+        columns={columns}
+        data={items}
+        selectable={true}
+        selectedElements={onSelectedElements}
+      />
     </div>
   );
 }

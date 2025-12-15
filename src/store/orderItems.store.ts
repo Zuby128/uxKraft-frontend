@@ -5,8 +5,18 @@ import {
 } from "@/services/order-items.service";
 import type { OrderItem } from "@/types/order-item.type";
 
+const buildMap = (items: OrderItem[]) =>
+  items.reduce((acc, item) => {
+    acc[item.orderItemId] = item;
+    return acc;
+  }, {} as Record<number, OrderItem>);
+
 interface OrderItemsState {
   items: any[];
+  mapObject: Record<number, OrderItem>;
+
+  selectedItemIds: number[];
+  setSelectedItemIds: (ids: number[]) => void;
   meta: {
     page: number;
     limit: number;
@@ -28,6 +38,8 @@ interface OrderItemsState {
 
 export const useOrderItemsStore = create<OrderItemsState>((set, get) => ({
   items: [],
+  mapObject: {},
+  selectedItemIds: [],
   meta: {
     page: 1,
     limit: 10,
@@ -37,12 +49,18 @@ export const useOrderItemsStore = create<OrderItemsState>((set, get) => ({
   loading: false,
   error: null,
 
+  setSelectedItemIds: (ids: number[]) => {
+    set({ selectedItemIds: ids });
+  },
+
   fetchAll: async () => {
     try {
       set({ loading: true, error: null });
       const res = await getOrderItems();
+
       set({
         items: res.data,
+        mapObject: buildMap(res.data),
         meta: res.meta,
         loading: false,
       });
@@ -63,6 +81,7 @@ export const useOrderItemsStore = create<OrderItemsState>((set, get) => ({
 
       set({
         items: res.data,
+        mapObject: buildMap(res.data),
         meta: res.meta,
         loading: false,
       });
@@ -71,11 +90,16 @@ export const useOrderItemsStore = create<OrderItemsState>((set, get) => ({
     }
   },
 
-  updateList: (id: number, payload: Partial<OrderItem>) => {
-    set((state) => ({
-      items: state.items.map((item) =>
+  updateList: (id, payload) => {
+    set((state) => {
+      const updatedItems = state.items.map((item) =>
         item.orderItemId === id ? { ...item, ...payload } : item
-      ),
-    }));
+      );
+
+      return {
+        items: updatedItems,
+        mapObject: buildMap(updatedItems),
+      };
+    });
   },
 }));

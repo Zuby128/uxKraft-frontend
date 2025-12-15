@@ -26,6 +26,7 @@ interface DataTableProps<TData> {
   }[];
   data: TData[];
   selectable?: boolean;
+  selectedElements?: (idx: number[]) => void;
 }
 
 const range = (n: number): number[] => {
@@ -40,6 +41,7 @@ export function DataTable<TData extends Record<string, any>>({
   columns,
   data,
   selectable = true,
+  selectedElements,
 }: DataTableProps<TData>) {
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
 
@@ -61,12 +63,14 @@ export function DataTable<TData extends Record<string, any>>({
         paginatedData.forEach((_, idx) =>
           next.delete(pageIndex * pageSize + idx)
         );
+        selectedElements && selectedElements(Array.from(next) || []);
         return next;
       });
     } else {
       setSelectedRows((prev) => {
         const next = new Set(prev);
         paginatedData.forEach((_, idx) => next.add(pageIndex * pageSize + idx));
+        selectedElements && selectedElements(Array.from(next) || []);
         return next;
       });
     }
@@ -78,7 +82,8 @@ export function DataTable<TData extends Record<string, any>>({
       if (next.has(index)) next.delete(index);
       else next.add(index);
 
-      console.log(index);
+      selectedElements && selectedElements(Array.from(next) || []);
+
       return next;
     });
   };
