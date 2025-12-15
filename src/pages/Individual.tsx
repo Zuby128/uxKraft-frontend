@@ -1,158 +1,109 @@
 import { DataTable } from "@/components/common/DataTable";
 import TableSearch from "@/components/common/TableSearch";
 import IndividualItemDetails from "@/components/individual/IndividualItemDetails";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useRightSidebarStore } from "@/store/RightSidebarStore";
-import { ChevronDown } from "lucide-react";
-
-const data = [
-  {
-    key: "select", // checkbox için kullanılacak (genelde id veya unique key)
-    item: "ITM-001",
-    spec: "SPEC-101",
-    name: 'Stainless Steel Pipe 4"',
-    vendor: "Acme Suppliers Inc.",
-    shipTo: "Warehouse A - New York",
-    qty: 150,
-    phase: "Phase 1",
-    price: 2450.0,
-    shipNotes: "Handle with care, fragile fittings included",
-  },
-  {
-    key: "select",
-    item: "ITM-002",
-    spec: "SPEC-205",
-    name: "Gate Valve DN100",
-    vendor: "Global Valves Ltd.",
-    shipTo: "Site B - Construction Zone 3",
-    qty: 24,
-    phase: "Phase 2",
-    price: 1820.5,
-    shipNotes: "Requires immediate delivery before 20 Dec",
-  },
-  {
-    key: "select",
-    item: "ITM-003",
-    spec: "SPEC-308",
-    name: "Electric Motor 15kW",
-    vendor: "PowerTech Industries",
-    shipTo: "Plant C - Main Building",
-    qty: 8,
-    phase: "Phase 1",
-    price: 5670.0,
-    shipNotes: "",
-  },
-  {
-    key: "select",
-    item: "ITM-004",
-    spec: "SPEC-412",
-    name: "Pressure Transmitter",
-    vendor: "Sensor Solutions GmbH",
-    shipTo: "Warehouse A - New York",
-    qty: 45,
-    phase: "Phase 3",
-    price: 890.75,
-    shipNotes: "Calibration certificate required",
-  },
-  {
-    key: "select",
-    item: "ITM-005",
-    spec: "SPEC-119",
-    name: 'PVC Conduit 2"',
-    vendor: "PipeMaster Co.",
-    shipTo: "Site B - Construction Zone 1",
-    qty: 500,
-    phase: "Phase 2",
-    price: 1200.0,
-    shipNotes: "Bundle in 10m lengths",
-  },
-];
+import { useOrderItemsStore } from "@/store/orderItems.store";
+import { useVendorsStore } from "@/store/vendorsStore";
+import { exportToCsv } from "@/utils/export-to-csv";
+import { mapOrderItemsToCsv } from "@/utils/json-to-csv";
+import { useEffect, useMemo } from "react";
 
 function Individual() {
   const { openBar } = useRightSidebarStore();
-  const columns: any = [
-    { key: "select", header: "" }, // checkbox için boş başlık
-    { key: "item", header: "Item#" },
-    { key: "spec", header: "Spec #" },
-    {
-      key: "name",
-      header: "Item Name",
-      render: (row: any) => (
-        <a
-          className="text-primary cursor-pointer"
-          onClick={() =>
-            openBar(
-              <>
-                "Item Name #003"{" "}
-                <span className="text-sm underline ml-4">Edit</span>
-              </>,
-              <IndividualItemDetails />
-            )
-          }
-        >
-          {row.name}
-        </a>
-      ),
-    },
-    {
-      key: "vendor",
-      header: "Vendor",
-    },
-    {
-      key: "shipTo",
-      header: "Ship To",
-    },
-    {
-      key: "qty",
-      header: "Qty",
-    },
-    {
-      key: "phase",
-      header: "Phase",
-    },
-    {
-      key: "price",
-      header: "Price",
-    },
-    {
-      key: "shipNotes",
-      header: "Ship Notes",
-      render: (row: any) => (
-        <div className="w-full max-w-[150px] truncate">{row.shipNotes}</div>
-      ),
-    },
-    {
-      key: "action",
-      header: "Action",
-      render: (row: any) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="text-xs">
-              Action <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuGroup>
-              <DropdownMenuItem>Edit</DropdownMenuItem>
-              <DropdownMenuItem>Delete</DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
-    },
-  ];
+  const phase = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+
+  const items = useOrderItemsStore((s) => s.items);
+  const loading = useOrderItemsStore((s) => s.loading);
+  const search = useOrderItemsStore((s) => s.search);
+  const fetchAll = useOrderItemsStore((s) => s.fetchAll);
+
+  const { vendors, fetchVendors } = useVendorsStore();
+
+  useEffect(() => {
+    fetchAll();
+    fetchVendors();
+  }, [fetchAll, fetchVendors]);
+
+  const handleExport = () => {
+    const csvData = mapOrderItemsToCsv(items);
+    exportToCsv("order-items.csv", csvData);
+  };
+
+  const columns = useMemo(
+    () => [
+      { key: "orderItemId", header: "Order #" },
+      {
+        key: "item",
+        header: "Item #",
+        render: (row: any) => row?.item?.itemId,
+      },
+      {
+        key: "spec",
+        header: "Spec #",
+        render: (row: any) => row?.item?.specNo,
+      },
+      {
+        key: "name",
+        header: "Item Name",
+        render: (row: any) => (
+          <a
+            className="text-primary cursor-pointer"
+            onClick={() =>
+              openBar(
+                <>
+                  {row?.item?.itemName} #{row?.item?.itemId}
+                  <span className="text-sm underline ml-4">Edit</span>
+                </>,
+                <IndividualItemDetails />
+              )
+            }
+          >
+            {row?.item?.itemName}
+          </a>
+        ),
+      },
+      {
+        key: "vendor",
+        header: "Vendor",
+        render: (row: any) => row?.vendor?.vendorName,
+      },
+      {
+        key: "shipTo",
+        header: "Ship To",
+        render: (row: any) => (
+          <div className="truncate max-w-[150px]">{row?.customer?.name}</div>
+        ),
+      },
+      { key: "quantity", header: "Qty" },
+      { key: "phase", header: "Phase" },
+      {
+        key: "price",
+        header: "Price",
+        render: (row: any) => row?.totalPrice / 100,
+      },
+      {
+        key: "shipNotes",
+        header: "Ship Notes",
+        render: (row: any) => (
+          <div className="truncate max-w-[150px]">
+            {row?.logistics?.shippingNotes}
+          </div>
+        ),
+      },
+    ],
+    [openBar]
+  );
 
   return (
     <div className="w-full max-w-7xl">
-      <TableSearch />
-      <DataTable columns={columns} data={data} />
+      <TableSearch
+        vendors={vendors}
+        phase={phase}
+        onSearch={search}
+        onReset={fetchAll}
+        onExport={handleExport}
+      />
+      <DataTable columns={columns} data={items} selectable={false} />
     </div>
   );
 }

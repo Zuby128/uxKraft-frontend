@@ -25,6 +25,7 @@ interface DataTableProps<TData> {
     render?: (row: TData) => React.ReactNode;
   }[];
   data: TData[];
+  selectable?: boolean;
 }
 
 const range = (n: number): number[] => {
@@ -38,6 +39,7 @@ const range = (n: number): number[] => {
 export function DataTable<TData extends Record<string, any>>({
   columns,
   data,
+  selectable = true,
 }: DataTableProps<TData>) {
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
 
@@ -93,13 +95,15 @@ export function DataTable<TData extends Record<string, any>>({
         <Table>
           <TableHeader className="bg-[#f6f3f3]">
             <TableRow>
-              <TableHead className="w-12">
-                <Checkbox
-                  checked={isAllPageSelected}
-                  onCheckedChange={toggleAllPage}
-                  aria-label="Select all"
-                />
-              </TableHead>
+              {selectable && (
+                <TableHead>
+                  <Checkbox
+                    checked={isAllPageSelected}
+                    onCheckedChange={toggleAllPage}
+                    aria-label="Select all"
+                  />
+                </TableHead>
+              )}
 
               {columns.map((col) => (
                 <TableHead key={String(col.key)}>{col.header}</TableHead>
@@ -118,13 +122,15 @@ export function DataTable<TData extends Record<string, any>>({
                     key={globalIndex}
                     data-state={isSelected && "selected"}
                   >
-                    <TableCell>
-                      <Checkbox
-                        checked={isSelected}
-                        onCheckedChange={() => toggleRow(globalIndex)}
-                        aria-label="select row"
-                      />
-                    </TableCell>
+                    {selectable && (
+                      <TableCell>
+                        <Checkbox
+                          checked={isSelected}
+                          onCheckedChange={() => toggleRow(globalIndex)}
+                          aria-label="select row"
+                        />
+                      </TableCell>
+                    )}
 
                     {columns.map((col) => (
                       <TableCell key={String(col.key)}>

@@ -113,7 +113,3 @@ thead {
 .stripped td {
   border-right: 1px solid #e5e5e5;
 }
-.stripped th:first-child,
-.stripped td:first-child {
-  border-right: none;
-}

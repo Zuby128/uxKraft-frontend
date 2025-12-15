@@ -92,7 +92,6 @@ const users = [
 function Bulk() {
   const { openBar } = useRightSidebarStore();
   const columns: any = [
-    { key: "select", header: "" }, // checkbox için boş başlık
     { key: "name", header: "Ad" },
     { key: "email", header: "E-posta" },
     {
