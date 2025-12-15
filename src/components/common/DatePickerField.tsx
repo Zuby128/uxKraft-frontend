@@ -24,15 +24,21 @@ function DatePickerField({
 }: DatePickerFieldProps) {
   const [open, setOpen] = useState(false);
 
-  /**
-   * String -> Date
-   * Memoized for render optimization
-   */
   const selectedDate = useMemo(() => {
     if (!value) return undefined;
     const date = new Date(value);
     return isNaN(date.getTime()) ? undefined : date;
   }, [value]);
+
+  const formattedDate = useMemo(() => {
+    if (!selectedDate) return "Select date";
+
+    const mm = String(selectedDate.getMonth() + 1).padStart(2, "0");
+    const dd = String(selectedDate.getDate()).padStart(2, "0");
+    const yyyy = selectedDate.getFullYear();
+
+    return `${mm}-${dd}-${yyyy}`;
+  }, [selectedDate]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -46,7 +52,7 @@ function DatePickerField({
             disabled={disabled}
             className="w-full justify-between font-normal"
           >
-            {selectedDate ? selectedDate.toLocaleDateString() : "Select date"}
+            {formattedDate}
             <ChevronDownIcon className="ml-2 h-4 w-4 opacity-60" />
           </Button>
         </PopoverTrigger>

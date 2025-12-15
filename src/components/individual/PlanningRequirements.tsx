@@ -1,124 +1,63 @@
-import { Label } from "../ui/label";
-import { Calendar } from "@/components/ui/calendar";
+import { toast } from "sonner";
+import DatePickerField from "../common/DatePickerField";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "../ui/button";
-import { ChevronDownIcon } from "lucide-react";
-import { useState } from "react";
-import DateSection from "../common/DateSection";
+  createOrderPlanning,
+  patchOrderPlanning,
+} from "@/services/sub-orders.service";
 
 function PlanningRequirements({ item }: { item: any }) {
-  const [open, setOpen] = useState<boolean>(false);
-  const [date, setDate] = useState<Date | undefined>();
+  const onUpdatePlanning = async (date: any, title: string) => {
+    try {
+      if (item?.planning?.planningId) {
+        await patchOrderPlanning(item?.planning?.planningId, { [title]: date });
+      } else {
+        await createOrderPlanning({
+          orderItemId: item?.orderItemId,
+          [title]: date,
+        });
+      }
+      toast("Plan Updated");
+    } catch (error) {
+      toast("Failed, please try again later");
+    }
+  };
 
-  console.log(date);
+  const checkIsLate = () => {
+    const diff =
+      new Date(item?.planning?.expectedDelivery).getTime() -
+      new Date(item?.planning?.hotelNeedByDate).getTime();
+    if (diff > 0) {
+      return diff;
+    } else {
+      return null;
+    }
+  };
+
   return (
     <div className="p-4 bg-white">
-      sss
-      <DateSection
-        title="Planning & Requirements"
-        sectionKey="planning"
-        data={item?.planning}
-        fields={[
-          { key: "poApprovalDate", label: "PO Approval Date" },
-          { key: "hotelNeedByDate", label: "Hotel Need By Date" },
-          { key: "expectedDelivery", label: "Expected Delivery" },
-        ]}
-        onChange={(field, value) => console.log("planning", { [field]: value })}
-      />
-      ; dddd
       <div className="font-bold mb-4">Planning & Requirements</div>
-      <div className="grid grid-cols-3 gap-4">
-        <div>
-          <Label className="mb-2">PO Approval Date</Label>
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                id="date"
-                className="w-full justify-between font-normal"
-              >
-                {date ? date.toLocaleDateString() : "Select date"}
-                <ChevronDownIcon />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-auto overflow-hidden p-0"
-              align="start"
-            >
-              <Calendar
-                mode="single"
-                selected={date}
-                captionLayout="dropdown"
-                onSelect={(date) => {
-                  setDate(date);
-                  setOpen(false);
-                }}
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-        <div>
-          <Label className="mb-2">Hotel Need by Date</Label>
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                id="date"
-                className="w-full justify-between font-normal"
-              >
-                {date ? date.toLocaleDateString() : "Select date"}
-                <ChevronDownIcon />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-auto overflow-hidden p-0"
-              align="start"
-            >
-              <Calendar
-                mode="single"
-                selected={date}
-                captionLayout="dropdown"
-                onSelect={(date) => {
-                  setDate(date);
-                  setOpen(false);
-                }}
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-        <div>
-          <Label className="mb-2">Expected Delivery</Label>
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                id="date"
-                className="w-full justify-between font-normal"
-              >
-                {date ? date.toLocaleDateString() : "Select date"}
-                <ChevronDownIcon />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-auto overflow-hidden p-0"
-              align="start"
-            >
-              <Calendar
-                mode="single"
-                selected={date}
-                captionLayout="dropdown"
-                onSelect={(date) => {
-                  setDate(date);
-                  setOpen(false);
-                }}
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
+      <div className="grid grid-cols-3 gap-4 relative">
+        <DatePickerField
+          label={"PO Approval Date"}
+          value={item?.planning?.poApprovalDate ?? null}
+          onChange={(date) => onUpdatePlanning(date, "poApprovalDate")}
+        />
+
+        <DatePickerField
+          label={"Hotel Need by Date"}
+          value={item?.planning?.hotelNeedByDate ?? null}
+          onChange={(date) => onUpdatePlanning(date, "hotelNeedByDate")}
+        />
+
+        <DatePickerField
+          label={"Expected Delivery"}
+          value={item?.planning?.expectedDelivery ?? null}
+          onChange={(date) => onUpdatePlanning(date, "expectedDelivery")}
+        />
+
+        <span className="text-red-500 text-xs absolute -bottom-4 right-0">
+          Late by {checkIsLate()} days
+        </span>
       </div>
     </div>
   );

@@ -13,6 +13,17 @@ export const patchOrderPlanning = async (
   return apix.patch(`/order-planning/${id}`, body);
 };
 
+export const createOrderPlanning = async (body: {
+  orderItemId: number;
+  poApprovalDate?: string;
+  hotelNeedByDate?: string;
+  expectedDelivery?: string;
+}) => {
+  const apix = await api();
+
+  return apix.post(`/order-planning`, body);
+};
+
 export const patchOrderProduction = async (
   id: number,
   body: {
@@ -26,6 +37,17 @@ export const patchOrderProduction = async (
   return apix.patch(`/order-production/${id}`, body);
 };
 
+export const createOrderProduction = async (body: {
+  orderItemId: number;
+  cfaShopsSend?: string;
+  cfaShopsApproved?: string;
+  cfaShopsDelivered?: string;
+}) => {
+  const apix = await api();
+
+  return apix.post(`/order-production`, body);
+};
+
 export const patchOrderLogistics = async (
   id: number,
   body: {
@@ -37,4 +59,16 @@ export const patchOrderLogistics = async (
 ) => {
   const apix = await api();
   return apix.patch(`/order-logistics/${id}`, body);
+};
+
+export const createOrderLogistics = async (body: {
+  orderItemId: number;
+  orderedDate?: string;
+  shippedDate?: string;
+  deliveredDate?: string;
+  shippingNotes?: string;
+}) => {
+  const apix = await api();
+
+  return apix.post(`/order-logistics`, body);
 };
