@@ -1,4 +1,4 @@
-import { Container, Truck } from "lucide-react";
+import { Container, Database, Truck } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 import {
@@ -13,6 +13,11 @@ import {
 } from "@/components/ui/sidebar";
 
 const items = [
+  {
+    title: "Schema",
+    url: "/dashboard/schema",
+    icon: Database,
+  },
   {
     title: "Individual Operations",
     url: "/dashboard/individual",

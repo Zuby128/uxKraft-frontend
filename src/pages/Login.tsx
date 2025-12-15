@@ -17,8 +17,8 @@ import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 
 const initialValues: ILoginBody = {
-  email: "",
-  password: "",
+  email: "test@email.com",
+  password: "123456",
 };
 
 export default function Login() {

@@ -12,6 +12,7 @@ import Individual from "./pages/Individual";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import { UserRole } from "./types/enums.type";
 import Bulk from "./pages/Bulk";
+import SchemaPage from "./pages/Schema";
 
 const router = createBrowserRouter([
   {
@@ -24,7 +25,15 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to="/dashboard/individual" replace />,
+        element: <Navigate to="/dashboard/schema" replace />,
+      },
+      {
+        path: "dashboard/schema",
+        element: (
+          <ProtectedRoute allowedRoles={[UserRole.user]}>
+            <SchemaPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "dashboard/individual",
@@ -45,7 +54,7 @@ const router = createBrowserRouter([
       // Fallback for /dashboard
       {
         path: "dashboard",
-        element: <Navigate to="/dashboard/individual" replace />,
+        element: <Navigate to="/dashboard/schema" replace />,
       },
     ],
   },
