@@ -22,15 +22,17 @@ function PlanningRequirements({ item }: { item: any }) {
     }
   };
 
-  const checkIsLate = () => {
-    const diff =
-      new Date(item?.planning?.expectedDelivery).getTime() -
-      new Date(item?.planning?.hotelNeedByDate).getTime();
-    if (diff > 0) {
-      return diff;
-    } else {
+  const getLateDays = (): number | null => {
+    if (!item?.planning?.expectedDelivery || !item?.planning?.hotelNeedByDate)
       return null;
-    }
+
+    const expected = new Date(`${item?.planning?.expectedDelivery}T00:00:00Z`);
+    const needBy = new Date(`${item?.planning?.hotelNeedByDate}T00:00:00Z`);
+
+    const diffMs = expected.getTime() - needBy.getTime();
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    return diffDays > 0 ? diffDays : null;
   };
 
   return (
@@ -55,9 +57,11 @@ function PlanningRequirements({ item }: { item: any }) {
           onChange={(date) => onUpdatePlanning(date, "expectedDelivery")}
         />
 
-        <span className="text-red-500 text-xs absolute -bottom-4 right-0">
-          Late by {checkIsLate()} days
-        </span>
+        {getLateDays() && (
+          <span className="text-red-500 text-xs absolute -bottom-4 right-0">
+            Late by {getLateDays()} days
+          </span>
+        )}
       </div>
     </div>
   );
