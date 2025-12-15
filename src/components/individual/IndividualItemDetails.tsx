@@ -9,9 +9,9 @@ function IndividualItemDetails() {
   return (
     <div className=" flex flex-col gap-4">
       <IndividualItem item={item} />
-      <PlanningRequirements item={item} />
-      <ProductionShop item={item} />
-      <Shipping item={item} />
+      <PlanningRequirements />
+      <ProductionShop />
+      <Shipping />
     </div>
   );
 }

@@ -4,16 +4,32 @@ import {
   createOrderPlanning,
   patchOrderPlanning,
 } from "@/services/sub-orders.service";
+import { useOrderItemStore } from "@/store/order-item.store";
 
-function PlanningRequirements({ item }: { item: any }) {
+function PlanningRequirements() {
+  const { item, updateSection } = useOrderItemStore();
   const onUpdatePlanning = async (date: any, title: string) => {
     try {
       if (item?.planning?.planningId) {
-        await patchOrderPlanning(item?.planning?.planningId, { [title]: date });
-      } else {
-        await createOrderPlanning({
-          orderItemId: item?.orderItemId,
+        const { data } = await patchOrderPlanning(item?.planning?.planningId, {
           [title]: date,
+        });
+        updateSection("planning", {
+          planningId: data.planningId,
+          poApprovalDate: data.poApprovalDate,
+          hotelNeedByDate: data.hotelNeedByDate,
+          expectedDelivery: data.expectedDelivery,
+        });
+      } else {
+        const { data } = await createOrderPlanning({
+          orderItemId: item?.orderItemId as any,
+          [title]: date,
+        });
+        updateSection("planning", {
+          planningId: data.planningId,
+          poApprovalDate: data.poApprovalDate,
+          hotelNeedByDate: data.hotelNeedByDate,
+          expectedDelivery: data.expectedDelivery,
         });
       }
       toast("Plan Updated");
@@ -41,19 +57,19 @@ function PlanningRequirements({ item }: { item: any }) {
       <div className="grid grid-cols-3 gap-4 relative">
         <DatePickerField
           label={"PO Approval Date"}
-          value={item?.planning?.poApprovalDate ?? null}
+          value={(item?.planning?.poApprovalDate as any) ?? null}
           onChange={(date) => onUpdatePlanning(date, "poApprovalDate")}
         />
 
         <DatePickerField
           label={"Hotel Need by Date"}
-          value={item?.planning?.hotelNeedByDate ?? null}
+          value={(item?.planning?.hotelNeedByDate as any) ?? null}
           onChange={(date) => onUpdatePlanning(date, "hotelNeedByDate")}
         />
 
         <DatePickerField
           label={"Expected Delivery"}
-          value={item?.planning?.expectedDelivery ?? null}
+          value={(item?.planning?.expectedDelivery as any) ?? null}
           onChange={(date) => onUpdatePlanning(date, "expectedDelivery")}
         />
 
