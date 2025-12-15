@@ -3,6 +3,7 @@ import {
   getOrderItems,
   getFilteredOrderItems,
 } from "@/services/order-items.service";
+import type { OrderItem } from "@/types/order-item.type";
 
 interface OrderItemsState {
   items: any[];
@@ -21,9 +22,11 @@ interface OrderItemsState {
     vendorId?: string;
     phase?: string;
   }) => Promise<void>;
+
+  updateList: (id: number, item: OrderItem) => void;
 }
 
-export const useOrderItemsStore = create<OrderItemsState>((set) => ({
+export const useOrderItemsStore = create<OrderItemsState>((set, get) => ({
   items: [],
   meta: {
     page: 1,
@@ -66,5 +69,13 @@ export const useOrderItemsStore = create<OrderItemsState>((set) => ({
     } catch {
       set({ loading: false, error: "Search failed" });
     }
+  },
+
+  updateList: (id: number, payload: Partial<OrderItem>) => {
+    set((state) => ({
+      items: state.items.map((item) =>
+        item.orderItemId === id ? { ...item, ...payload } : item
+      ),
+    }));
   },
 }));

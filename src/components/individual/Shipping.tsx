@@ -7,9 +7,11 @@ import {
 } from "@/services/sub-orders.service";
 import { toast } from "sonner";
 import { useOrderItemStore } from "@/store/order-item.store";
+import { useState } from "react";
 
 function Shipping() {
   const { item, updateSection } = useOrderItemStore();
+  const [input, setInput] = useState(item?.logistics?.shippingNotes || "");
 
   const onUpdatePlanning = async (date: any, title: string) => {
     try {
@@ -46,10 +48,41 @@ function Shipping() {
     }
   };
 
-  const handleChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    updateSection("logistics", {
-      shippingNotes: e.target.value,
-    });
+  const handleBlur = async () => {
+    if (input === item?.logistics?.shippingNotes) return;
+
+    try {
+      updateSection("logistics", {
+        shippingNotes: input,
+      });
+
+      if (item?.logistics?.logisticsId) {
+        const { data } = await patchOrderLogistics(
+          item?.logistics?.logisticsId,
+          {
+            shippingNotes: input,
+          }
+        );
+        updateSection("logistics", {
+          shippingNotes: data?.shippingNotes,
+        });
+      } else {
+        const { data } = await createOrderLogistics({
+          orderItemId: item?.orderItemId as any,
+          shippingNotes: input,
+        });
+        updateSection("logistics", {
+          logisticsId: data?.logisticsId,
+          orderedDate: data?.orderedDate,
+          deliveredDate: data?.deliveredDate,
+          shippedDate: data?.shippedDate,
+          shippingNotes: data?.shippingNotes,
+        });
+      }
+      toast.success("Shipping notes updated");
+    } catch (error) {
+      toast.error("Failed to update notes");
+    }
   };
 
   return (
@@ -77,9 +110,10 @@ function Shipping() {
         <Textarea
           placeholder="Delicate product"
           className="text-sm"
-          value={item?.logistics?.shippingNotes || ""}
+          value={input}
           rows={5}
-          onChange={handleChange}
+          onChange={(e) => setInput(e.target.value)}
+          onBlur={handleBlur}
         />
       </div>
     </div>

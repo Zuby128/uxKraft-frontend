@@ -1,5 +1,6 @@
 import type { DateSectionKey, OrderItem } from "@/types/order-item.type";
 import { create } from "zustand";
+import { useOrderItemsStore } from "./orderItems.store";
 
 interface OrderItemState {
   item: OrderItem | null;
@@ -25,14 +26,16 @@ export const useOrderItemStore = create<OrderItemState>((set, get) => ({
     const { item } = get();
     if (!item) return;
 
-    set({
-      item: {
-        ...item,
-        [section]: {
-          ...(item as any)[section],
-          ...partial,
-        },
+    const updatedItem = {
+      ...item,
+      [section]: {
+        ...(item as any)[section],
+        ...partial,
       },
-    });
+    };
+
+    set({ item: updatedItem });
+
+    useOrderItemsStore.getState().updateList(item.orderItemId, updatedItem);
   },
 }));
