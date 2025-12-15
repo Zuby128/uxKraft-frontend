@@ -1,131 +1,105 @@
-import BulkEdit from "@/components/bulk/BulkEdit";
-import UpdateTracking from "@/components/bulk/UpdateTracking";
 import { DataTable } from "@/components/common/DataTable";
 import { EditTable } from "@/components/common/EditTable";
 import TableSearch from "@/components/common/TableSearch";
-import { Button } from "@/components/ui/button";
 import { useRightSidebarStore } from "@/store/RightSidebarStore";
-
-const users = [
-  {
-    id: 1,
-    name: "Ahmet Yılmaz",
-    email: "ahmet.yilmaz@example.com",
-    age: 34,
-    city: "İstanbul",
-    role: "Yönetici",
-  },
-  {
-    id: 2,
-    name: "Ayşe Kaya",
-    email: "ayse.kaya@example.com",
-    age: 28,
-    city: "Ankara",
-    role: "Editör",
-  },
-  {
-    id: 3,
-    name: "Mehmet Demir",
-    email: "mehmet.demir@example.com",
-    age: 42,
-    city: "İzmir",
-    role: "Geliştirici",
-  },
-  {
-    id: 4,
-    name: "Fatma Şahin",
-    email: "fatma.sahin@example.com",
-    age: 31,
-    city: "Bursa",
-    role: "Tasarımcı",
-  },
-  {
-    id: 5,
-    name: "Ali Çelik",
-    email: "ali.celik@example.com",
-    age: 29,
-    city: "Antalya",
-    role: "Geliştirici",
-  },
-  {
-    id: 6,
-    name: "Zeynep Öztürk",
-    email: "zeynep.ozturk@example.com",
-    age: 35,
-    city: "Adana",
-    role: "Analist",
-  },
-  {
-    id: 7,
-    name: "Mustafa Aydın",
-    email: "mustafa.aydin@example.com",
-    age: 27,
-    city: "Konya",
-    role: "Stajyer",
-  },
-  {
-    id: 8,
-    name: "Elif Arslan",
-    email: "elif.arslan@example.com",
-    age: 33,
-    city: "Gaziantep",
-    role: "Yönetici",
-  },
-  {
-    id: 9,
-    name: "Emre Polat",
-    email: "emre.polat@example.com",
-    age: 30,
-    city: "Trabzon",
-    role: "Geliştirici",
-  },
-  {
-    id: 10,
-    name: "Seda Erdoğan",
-    email: "seda.erdogan@example.com",
-    age: 26,
-    city: "Eskişehir",
-    role: "Pazarlama",
-  },
-];
+import { useOrderItemStore } from "@/store/order-item.store";
+import { useOrderItemsStore } from "@/store/orderItems.store";
+import { useVendorsStore } from "@/store/vendorsStore";
+import { exportToCsv } from "@/utils/export-to-csv";
+import { mapOrderItemsToCsv } from "@/utils/json-to-csv";
+import { useEffect, useMemo } from "react";
 
 function Bulk() {
   const { openBar } = useRightSidebarStore();
-  const columns: any = [
-    { key: "name", header: "Ad" },
-    { key: "email", header: "E-posta" },
-    {
-      key: "age",
-      header: "Yaş",
-      render: (row: any) => <Button variant="default">{row.age}</Button>,
-    },
-  ];
+  const phase = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
-  const onBulkEdit = () => {
-    openBar(" Bulk Edit", <BulkEdit />, "2 items will be updated", {
-      text: "Save Changes",
-      onClick: () => {},
-    });
+  const { selectItem } = useOrderItemStore();
+
+  const { items, loading, search, fetchAll } = useOrderItemsStore();
+
+  const { vendors, fetchVendors } = useVendorsStore();
+
+  useEffect(() => {
+    fetchAll();
+    fetchVendors();
+  }, [fetchAll, fetchVendors]);
+
+  const handleExport = () => {
+    const csvData = mapOrderItemsToCsv(items);
+    exportToCsv("order-items.csv", csvData);
   };
-  const onUpdateTracking = () => {
-    openBar("Update Tracking", <UpdateTracking />, "2 items will be updated", {
-      text: "Save Changes",
-      onClick: () => {},
-    });
-  };
+
+  const columns = useMemo(
+    () => [
+      { key: "orderItemId", header: "Order #" },
+      {
+        key: "item",
+        header: "Item #",
+        render: (row: any) => row?.item?.itemId,
+      },
+      {
+        key: "spec",
+        header: "Spec #",
+        render: (row: any) => row?.item?.specNo,
+      },
+      {
+        key: "name",
+        header: "Item Name",
+        render: (row: any) => row?.item?.itemName,
+      },
+      {
+        key: "vendor",
+        header: "Vendor",
+        render: (row: any) => row?.vendor?.vendorName,
+      },
+      {
+        key: "shipTo",
+        header: "Ship To",
+        render: (row: any) => (
+          <div className="truncate max-w-[150px]">{row?.customer?.name}</div>
+        ),
+      },
+      { key: "quantity", header: "Qty" },
+      { key: "phase", header: "Phase" },
+      {
+        key: "price",
+        header: "Price",
+        render: (row: any) => row?.totalPrice / 100,
+      },
+      {
+        key: "shipNotes",
+        header: "Ship Notes",
+        render: (row: any) => (
+          <div className="truncate max-w-[150px]">
+            {row?.logistics?.shippingNotes}
+          </div>
+        ),
+      },
+    ],
+    [openBar]
+  );
+
+  const onBulkEdit = () => {};
+  const onUpdateTracking = () => {};
   const onCreatePO = () => {};
   const onDelete = () => {};
 
   return (
     <div>
-      <TableSearch />
+      <TableSearch
+        vendors={vendors}
+        phase={phase}
+        onSearch={search}
+        onReset={fetchAll}
+        onExport={handleExport}
+      />
       <EditTable
         onBulkEdit={onBulkEdit}
         onUpdateTracking={onUpdateTracking}
         onCreatePO={onCreatePO}
         onDelete={onDelete}
       />
-      <DataTable columns={columns} data={users} />
+      <DataTable columns={columns} data={items} selectable={true} />
     </div>
   );
 }
