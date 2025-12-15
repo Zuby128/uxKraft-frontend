@@ -8,9 +8,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "../ui/button";
-import { useRef } from "react";
+import { memo, useRef } from "react";
+import { calculatePriceWithMarkupAndVAT } from "@/utils/price-with-markup";
 
-function IndividualItem() {
+function IndividualItem({ item }: { item: any }) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleClick = () => {
@@ -29,15 +30,15 @@ function IndividualItem() {
           <TableRow className="border-none hover:bg-transparent">
             <TableCell className="p-0 py-4 w-1/3 align-top">
               <div className="text-gray-700 mb-2">Spec #</div>
-              <div>BD-200</div>
+              <div>{item?.item?.specNo}</div>
             </TableCell>
             <TableCell className="p-0 py-4 w-1/3 align-top">
               <div className="text-gray-700 mb-2">Vendor</div>
-              <div>ABC Dapery</div>
+              <div>{item?.vendor?.vendorName}</div>
             </TableCell>
             <TableCell className="p-0 py-4 w-1/3 align-top">
               <div className="text-gray-700 mb-2">Phase</div>
-              <div>1</div>
+              <div>{item?.phase}</div>
             </TableCell>
           </TableRow>
 
@@ -45,17 +46,25 @@ function IndividualItem() {
           <TableRow className="border-none hover:bg-transparent">
             <TableCell className="p-0 py-4 w-1/3 align-top">
               <div className="text-gray-700 mb-2">Ship to</div>
-              <div className="font-bold">Sunrise Inn</div>
-              <div>BD-200</div>
+              <div className="font-bold w-full max-w-[150px] truncate">
+                {item?.customer?.name}
+              </div>
+              <div className="w-full max-w-[150px] truncate">
+                {item?.customer?.address}
+              </div>
             </TableCell>
             <TableCell className="p-0 py-4 w-1/3 align-top">
               <div className="text-gray-700 mb-2">Ship From</div>
-              <div className="font-bold">ABC Dapery</div>
+              <div className="font-bold w-full max-w-[150px] truncate">
+                {item?.item?.shipFrom}
+              </div>
               <div></div>
             </TableCell>
             <TableCell className="p-0 py-4 w-1/3 align-top">
               <div className="text-gray-700 mb-2">Notes for this item</div>
-              <div className="font-bold">Lorem ipsum dolor sit.</div>
+              <div className="font-bold max-w-[150px] truncate">
+                {item?.item?.notes}
+              </div>
               <div></div>
             </TableCell>
           </TableRow>
@@ -64,11 +73,11 @@ function IndividualItem() {
           <TableRow className="border-none hover:bg-transparent">
             <TableCell className="p-0 py-4 w-1/3 align-top">
               <div className="text-gray-700 mb-2">Location</div>
-              <div className="font-bold">Guest Room</div>
+              <div className="font-bold">{item?.item?.location}</div>
             </TableCell>
             <TableCell className="p-0 py-4 w-1/3 align-top">
               <div className="text-gray-700 mb-2">Category</div>
-              <div className="font-bold">Dapery</div>
+              <div className="font-bold">{item?.item?.categoryId}</div>
             </TableCell>
             <TableCell className="p-0 py-4 w-1/3 align-top">
               <div className="text-gray-700 mb-2">Upload</div>
@@ -93,7 +102,7 @@ function IndividualItem() {
       <Table className="[&_td]:border [&_th]:border border-slate-200 !w-full">
         <TableHeader className="bg-[#f6f3f3]">
           <TableRow>
-            <TableHead className="w-1/5">Description</TableHead>
+            <TableHead className="w-1/5 !h-full">Description</TableHead>
             <TableHead>Price</TableHead>
             <TableHead>Markup</TableHead>
             <TableHead>Unit Price</TableHead>
@@ -104,18 +113,25 @@ function IndividualItem() {
         <TableBody>
           <TableRow>
             <TableCell className="w-[200px] !text-wrap !line-clamp-2 ">
-              Brand Harmony Lorem ipsum dolor sit amet consectetur adipisicing.
+              {item?.item?.description ? item?.item?.description : "-"}
             </TableCell>
-            <TableCell>$2.000,00</TableCell>
-            <TableCell>20%</TableCell>
-            <TableCell>$2.400,00</TableCell>
-            <TableCell>2</TableCell>
-            <TableCell>each</TableCell>
+            <TableCell>${item?.unitPrice / 100}</TableCell>
+            <TableCell>{item?.markupPercentage}%</TableCell>
+            <TableCell>
+              $
+              {calculatePriceWithMarkupAndVAT(
+                item?.unitPrice,
+                item?.markupPercentage
+              )}
+            </TableCell>
+            <TableCell>{item?.quantity}</TableCell>
+            <TableCell>{item?.item?.unitType}</TableCell>
           </TableRow>
         </TableBody>
       </Table>
+      <p className="text-end font-bold">Total: ${item?.totalPrice / 100}</p>
     </div>
   );
 }
 
-export default IndividualItem;
+export default memo(IndividualItem);

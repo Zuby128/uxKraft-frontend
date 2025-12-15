@@ -1,72 +1,123 @@
 import { Label } from "../ui/label";
+import { Calendar } from "@/components/ui/calendar";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "../ui/button";
+import { ChevronDownIcon } from "lucide-react";
+import { useState } from "react";
+import DateSection from "../common/DateSection";
 
-function PlanningRequirements() {
+function PlanningRequirements({ item }: { item: any }) {
+  const [open, setOpen] = useState<boolean>(false);
+  const [date, setDate] = useState<Date | undefined>();
+
+  console.log(date);
   return (
     <div className="p-4 bg-white">
+      sss
+      <DateSection
+        title="Planning & Requirements"
+        sectionKey="planning"
+        data={item?.planning}
+        fields={[
+          { key: "poApprovalDate", label: "PO Approval Date" },
+          { key: "hotelNeedByDate", label: "Hotel Need By Date" },
+          { key: "expectedDelivery", label: "Expected Delivery" },
+        ]}
+        onChange={(field, value) => console.log("planning", { [field]: value })}
+      />
+      ; dddd
       <div className="font-bold mb-4">Planning & Requirements</div>
       <div className="grid grid-cols-3 gap-4">
         <div>
           <Label className="mb-2">PO Approval Date</Label>
-          <Select>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select a fruit" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Fruits</SelectLabel>
-                <SelectItem value="apple">Apple</SelectItem>
-                <SelectItem value="banana">Banana</SelectItem>
-                <SelectItem value="blueberry">Blueberry</SelectItem>
-                <SelectItem value="grapes">Grapes</SelectItem>
-                <SelectItem value="pineapple">Pineapple</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                id="date"
+                className="w-full justify-between font-normal"
+              >
+                {date ? date.toLocaleDateString() : "Select date"}
+                <ChevronDownIcon />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-auto overflow-hidden p-0"
+              align="start"
+            >
+              <Calendar
+                mode="single"
+                selected={date}
+                captionLayout="dropdown"
+                onSelect={(date) => {
+                  setDate(date);
+                  setOpen(false);
+                }}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
         <div>
           <Label className="mb-2">Hotel Need by Date</Label>
-          <Select>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select a fruit" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Fruits</SelectLabel>
-                <SelectItem value="apple">Apple</SelectItem>
-                <SelectItem value="banana">Banana</SelectItem>
-                <SelectItem value="blueberry">Blueberry</SelectItem>
-                <SelectItem value="grapes">Grapes</SelectItem>
-                <SelectItem value="pineapple">Pineapple</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                id="date"
+                className="w-full justify-between font-normal"
+              >
+                {date ? date.toLocaleDateString() : "Select date"}
+                <ChevronDownIcon />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-auto overflow-hidden p-0"
+              align="start"
+            >
+              <Calendar
+                mode="single"
+                selected={date}
+                captionLayout="dropdown"
+                onSelect={(date) => {
+                  setDate(date);
+                  setOpen(false);
+                }}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
         <div>
           <Label className="mb-2">Expected Delivery</Label>
-          <Select>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select a fruit" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Fruits</SelectLabel>
-                <SelectItem value="apple">Apple</SelectItem>
-                <SelectItem value="banana">Banana</SelectItem>
-                <SelectItem value="blueberry">Blueberry</SelectItem>
-                <SelectItem value="grapes">Grapes</SelectItem>
-                <SelectItem value="pineapple">Pineapple</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                id="date"
+                className="w-full justify-between font-normal"
+              >
+                {date ? date.toLocaleDateString() : "Select date"}
+                <ChevronDownIcon />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-auto overflow-hidden p-0"
+              align="start"
+            >
+              <Calendar
+                mode="single"
+                selected={date}
+                captionLayout="dropdown"
+                onSelect={(date) => {
+                  setDate(date);
+                  setOpen(false);
+                }}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
     </div>

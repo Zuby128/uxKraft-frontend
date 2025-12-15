@@ -7,15 +7,15 @@ import { useVendorsStore } from "@/store/vendorsStore";
 import { exportToCsv } from "@/utils/export-to-csv";
 import { mapOrderItemsToCsv } from "@/utils/json-to-csv";
 import { useEffect, useMemo } from "react";
+import { useOrderItemStore } from "@/store/order-item.store";
 
 function Individual() {
   const { openBar } = useRightSidebarStore();
   const phase = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
-  const items = useOrderItemsStore((s) => s.items);
-  const loading = useOrderItemsStore((s) => s.loading);
-  const search = useOrderItemsStore((s) => s.search);
-  const fetchAll = useOrderItemsStore((s) => s.fetchAll);
+  const { selectItem } = useOrderItemStore();
+
+  const { items, loading, search, fetchAll } = useOrderItemsStore();
 
   const { vendors, fetchVendors } = useVendorsStore();
 
@@ -27,6 +27,17 @@ function Individual() {
   const handleExport = () => {
     const csvData = mapOrderItemsToCsv(items);
     exportToCsv("order-items.csv", csvData);
+  };
+
+  const onOpenSideBar = (row: any) => {
+    selectItem(row);
+    openBar(
+      <>
+        {row?.item?.itemName} #{row?.item?.itemId}
+        <span className="text-sm underline ml-4">Edit</span>
+      </>,
+      <IndividualItemDetails />
+    );
   };
 
   const columns = useMemo(
@@ -48,15 +59,7 @@ function Individual() {
         render: (row: any) => (
           <a
             className="text-primary cursor-pointer"
-            onClick={() =>
-              openBar(
-                <>
-                  {row?.item?.itemName} #{row?.item?.itemId}
-                  <span className="text-sm underline ml-4">Edit</span>
-                </>,
-                <IndividualItemDetails />
-              )
-            }
+            onClick={() => onOpenSideBar(row)}
           >
             {row?.item?.itemName}
           </a>
