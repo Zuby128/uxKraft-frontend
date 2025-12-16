@@ -34,7 +34,6 @@ function Bulk() {
     mapObject,
     selectedItemIds,
     setSelectedItemIds,
-    clearSelectedItemIds,
     updateList,
   } = useOrderItemsStore();
 
@@ -44,10 +43,6 @@ function Bulk() {
     fetchAll();
     fetchVendors();
   }, [fetchAll, fetchVendors]);
-
-  useEffect(() => {
-    clearSelectedItemIds();
-  }, [clearSelectedItemIds]);
 
   const handleExport = useCallback(() => {
     const csvData = mapOrderItemsToCsv(items);
@@ -101,12 +96,11 @@ function Bulk() {
       });
 
       toast("Items Updated");
-      clearSelectedItemIds();
       reset();
     } catch {
       toast("Items Not Updated, please try again later");
     }
-  }, [selectedItemIds, getState, updateList, clearSelectedItemIds, reset]);
+  }, [selectedItemIds, getState, updateList, reset]);
 
   const onEditItemAction = useCallback(async () => {
     if (!selectedItemIds.length) {
@@ -157,20 +151,12 @@ function Bulk() {
       });
 
       toast("Items Updated");
-      clearSelectedItemIds();
       reset();
     } catch (error) {
       console.error(error);
       toast("Items Not Updated, please try again later");
     }
-  }, [
-    selectedItemIds,
-    getState,
-    mapObject,
-    updateList,
-    clearSelectedItemIds,
-    reset,
-  ]);
+  }, [selectedItemIds, getState, mapObject, updateList, reset]);
 
   const openTrackingSidebar = useCallback(
     (title: string, content: React.ReactNode) => {

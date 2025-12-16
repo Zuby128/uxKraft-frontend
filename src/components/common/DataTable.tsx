@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import {
   Table,
   TableBody,
@@ -44,23 +44,29 @@ export function DataTable<TData extends { orderItemId: number }>({
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(3);
 
-  const pageCount = Math.ceil(data.length / pageSize);
+  const pageCount = useMemo(
+    () => Math.ceil(data.length / pageSize),
+    [data.length, pageSize]
+  );
 
   const paginatedData = useMemo(() => {
     const start = pageIndex * pageSize;
     return data.slice(start, start + pageSize);
   }, [data, pageIndex, pageSize]);
 
-  const toggleRow = (rowId: number) => {
-    setSelectedRows((prev) => {
-      const next = new Set(prev);
-      next.has(rowId) ? next.delete(rowId) : next.add(rowId);
-      selectedElements?.(Array.from(next));
-      return next;
-    });
-  };
+  const toggleRow = useCallback(
+    (rowId: number) => {
+      setSelectedRows((prev) => {
+        const next = new Set(prev);
+        next.has(rowId) ? next.delete(rowId) : next.add(rowId);
+        selectedElements?.(Array.from(next));
+        return next;
+      });
+    },
+    [selectedElements]
+  );
 
-  const toggleAllPage = () => {
+  const toggleAllPage = useCallback(() => {
     const pageIds = paginatedData.map((r) => r.orderItemId);
 
     setSelectedRows((prev) => {
@@ -76,11 +82,35 @@ export function DataTable<TData extends { orderItemId: number }>({
       selectedElements?.(Array.from(next));
       return next;
     });
-  };
+  }, [paginatedData, selectedElements]);
 
-  const isAllPageSelected =
-    paginatedData.length > 0 &&
-    paginatedData.every((r) => selectedRows.has(r.orderItemId));
+  const isAllPageSelected = useMemo(
+    () =>
+      paginatedData.length > 0 &&
+      paginatedData.every((r) => selectedRows.has(r.orderItemId)),
+    [paginatedData, selectedRows]
+  );
+
+  const handlePageSizeChange = useCallback(
+    (v: string) => {
+      const newPageSize = Number(v);
+      setPageSize((oldPageSize) => {
+        setPageIndex((oldPageIndex) => {
+          const currentFirstItem = oldPageIndex * oldPageSize;
+          const newPageIndex = Math.floor(currentFirstItem / newPageSize);
+          return Math.min(
+            newPageIndex,
+            Math.ceil(data.length / newPageSize) - 1
+          );
+        });
+        return newPageSize;
+      });
+    },
+    [data.length]
+  );
+
+  const displayStart = pageSize * pageIndex + 1;
+  const displayEnd = Math.min(pageSize * (pageIndex + 1), data.length);
 
   return (
     <div className="space-y-4 min-w-xl text-xs">
@@ -93,7 +123,7 @@ export function DataTable<TData extends { orderItemId: number }>({
                   <Checkbox
                     checked={isAllPageSelected}
                     onCheckedChange={toggleAllPage}
-                    aria-label="Select all"
+                    aria-label="Select all on this page"
                   />
                 </TableHead>
               )}
@@ -124,7 +154,7 @@ export function DataTable<TData extends { orderItemId: number }>({
 
                     {columns.map((col) => (
                       <TableCell key={String(col.key)}>
-                        {col.render ? col.render(row) : row[col.key]}
+                        {col.render ? col.render(row) : String(row[col.key])}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -148,13 +178,7 @@ export function DataTable<TData extends { orderItemId: number }>({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Rows per page</span>
-          <Select
-            value={`${pageSize}`}
-            onValueChange={(v) => {
-              setPageSize(Number(v));
-              setPageIndex(0);
-            }}
-          >
+          <Select value={`${pageSize}`} onValueChange={handlePageSizeChange}>
             <SelectTrigger className="w-20">
               <SelectValue />
             </SelectTrigger>
@@ -170,8 +194,7 @@ export function DataTable<TData extends { orderItemId: number }>({
 
         <div className="flex items-center">
           <span className="mr-2">
-            {pageSize * pageIndex + 1} -{" "}
-            {Math.min(pageSize * (pageIndex + 1), data.length)} of {data.length}
+            {displayStart} - {displayEnd} of {data.length}
           </span>
 
           <Button

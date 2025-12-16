@@ -48,8 +48,8 @@ function TableSearchComponent({
 
     onSearch({
       search: debouncedSearch || undefined,
-      vendorId: vendorId ? vendorId : undefined,
-      phase: phaseValue ? phaseValue : undefined,
+      vendorId: vendorId !== "empty" && vendorId ? vendorId : undefined,
+      phase: phaseValue !== "empty" && phaseValue ? phaseValue : undefined,
     });
   }, [debouncedSearch, vendorId, phaseValue, onSearch]);
 
@@ -80,6 +80,11 @@ function TableSearchComponent({
           <SelectContent>
             <SelectGroup>
               <SelectLabel>Phase</SelectLabel>
+              <SelectItem value="empty">
+                <span className="text-muted-foreground italic">
+                  Clear selection
+                </span>
+              </SelectItem>
               {phase.map((p) => (
                 <SelectItem key={p} value={p}>
                   {p}
@@ -99,6 +104,11 @@ function TableSearchComponent({
           <SelectContent>
             <SelectGroup>
               <SelectLabel>Vendor</SelectLabel>
+              <SelectItem value="empty">
+                <span className="text-muted-foreground italic">
+                  Clear selection
+                </span>
+              </SelectItem>
               {vendors.map((v) => (
                 <SelectItem key={v.vendorId} value={String(v.vendorId)}>
                   {v.vendorName}

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Card, CardContent } from "../ui/card";
 import { SidebarTrigger, useSidebar } from "../ui/sidebar";
 import useAuthStore from "@/store/AuthStore";
@@ -9,10 +9,22 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useCategoriesStore } from "@/store/categoriesStore";
+import { useVendorsStore } from "@/store/vendorsStore";
 
 function DashboardContent({ children }: { children: ReactNode }) {
+  const { fetchCategories } = useCategoriesStore();
+  const { fetchVendors } = useVendorsStore();
   const { open, isMobile } = useSidebar();
   const { logout } = useAuthStore();
+
+  useEffect(() => {
+    asyncCall();
+  }, []);
+
+  const asyncCall = async () => {
+    await Promise.all([fetchVendors(), fetchCategories()]);
+  };
 
   return (
     <div
