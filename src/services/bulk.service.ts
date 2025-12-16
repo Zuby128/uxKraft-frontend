@@ -42,5 +42,5 @@ export const patchBulkItems = async (body: {
 }) => {
   const apix = await api();
 
-  return apix.patch(`/order-production/bulk-update`, body);
+  return apix.patch(`/items/bulk-update`, body);
 };

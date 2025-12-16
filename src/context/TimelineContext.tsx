@@ -23,6 +23,12 @@ type TimelineState = {
     cfaShopsApproved?: Date | null;
     cfaShopsDelivered?: Date | null;
   };
+  bulkEdit: {
+    location?: string;
+    categoryId?: number | null;
+    shipFrom?: string;
+    notes?: string;
+  };
 };
 
 type UpdateFieldPayload = {
@@ -33,20 +39,34 @@ type UpdateFieldPayload = {
 
 type TimelineContextValue = {
   state: TimelineState;
-
-  /** 🔹 form input’ları için */
   updateField: (payload: UpdateFieldPayload) => void;
-
-  /** 🔹 sidebar save için */
   getState: () => TimelineState;
-
   reset: () => void;
 };
 
 const defaultState: TimelineState = {
-  logistics: {},
-  planning: {},
-  production: {},
+  logistics: {
+    orderedDate: null,
+    shippedDate: null,
+    deliveredDate: null,
+    shippingNotes: "",
+  },
+  planning: {
+    poApprovalDate: null,
+    hotelNeedByDate: null,
+    expectedDelivery: null,
+  },
+  production: {
+    cfaShopsSend: null,
+    cfaShopsApproved: null,
+    cfaShopsDelivered: null,
+  },
+  bulkEdit: {
+    location: "",
+    categoryId: null,
+    shipFrom: "",
+    notes: "",
+  },
 };
 
 const TimelineContext = createContext<TimelineContextValue | null>(null);
@@ -56,7 +76,6 @@ export const TimelineProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [state, setState] = useState<TimelineState>(defaultState);
 
-  /** 🔥 latest snapshot */
   const stateRef = useRef(state);
   stateRef.current = state;
 
@@ -75,9 +94,9 @@ export const TimelineProvider: React.FC<{ children: React.ReactNode }> = ({
     []
   );
 
-  const reset = () => {
+  const reset = useCallback(() => {
     setState(defaultState);
-  };
+  }, []);
 
   return (
     <TimelineContext.Provider

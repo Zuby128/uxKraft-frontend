@@ -6,6 +6,7 @@ import { EditTable } from "@/components/common/EditTable";
 import TableSearch from "@/components/common/TableSearch";
 import { useTimeline } from "@/context/TimelineContext";
 import {
+  patchBulkItems,
   patchBulkOrderLogistics,
   patchBulkOrderPlanning,
   patchBulkOrderProduction,
@@ -28,6 +29,7 @@ function Bulk() {
     loading,
     fetchAll,
     search,
+    mapObject,
     selectedItemIds,
     setSelectedItemIds,
     clearSelectedItemIds,
@@ -147,10 +149,70 @@ function Bulk() {
     }
   };
 
-  const openBulkSidebar = (title: string, content: any) => {
+  const openTrackingSidebar = (title: string, content: any) => {
     openBar(title, content, `${selectedItemIds.length} items selected`, {
       text: "Save Changes",
       onClick: onBulkEditAction,
+    });
+  };
+
+  const onEditItemAction = async () => {
+    if (!selectedItemIds.length) {
+      toast("No items selected");
+      return;
+    }
+
+    const timelineState = getState();
+    const bulk = timelineState.bulkEdit;
+
+    const itemIds = Array.from(
+      new Set(
+        selectedItemIds
+          .map((orderItemId) => mapObject[orderItemId]?.item?.itemId)
+          .filter((id): id is number => typeof id === "number")
+      )
+    );
+
+    if (!itemIds.length) {
+      toast("No valid items found");
+      return;
+    }
+
+    try {
+      await patchBulkItems({
+        itemIds,
+        ...(bulk?.categoryId !== undefined &&
+          bulk?.categoryId !== null && { categoryId: bulk.categoryId }),
+        ...(bulk?.location?.trim() && { location: bulk.location }),
+        ...(bulk?.shipFrom?.trim() && { shipFrom: bulk.shipFrom }),
+        ...(bulk?.notes?.trim() && { notes: bulk.notes }),
+      });
+
+      selectedItemIds.forEach((orderItemId) => {
+        updateList(orderItemId, {
+          item: {
+            ...mapObject[orderItemId].item,
+            ...(bulk?.categoryId != null && { categoryId: bulk.categoryId }),
+            ...(bulk?.location && { location: bulk.location }),
+            ...(bulk?.shipFrom && { shipFrom: bulk.shipFrom }),
+            ...(bulk?.notes && { notes: bulk.notes }),
+          },
+        } as any);
+      });
+
+      toast("Items Updated");
+      clearSelectedItemIds();
+      reset();
+    } catch (error) {
+      console.error(error);
+      toast("Items Not Updated, please try again later");
+    }
+  };
+
+  const openBulkSidebar = (title: string, content: any) => {
+    openBar(title, content, `${selectedItemIds.length} items selected`, {
+      text: "Save Changes",
+      onClick: onEditItemAction,
     });
   };
 
@@ -167,7 +229,7 @@ function Bulk() {
       <EditTable
         onBulkEdit={() => openBulkSidebar("Bulk Edit", <BulkEdit />)}
         onUpdateTracking={() =>
-          openBulkSidebar("Update Tracking", <UpdateTracking />)
+          openTrackingSidebar("Update Tracking", <UpdateTracking />)
         }
         onCreatePO={() => {}}
         onDelete={() => {}}
