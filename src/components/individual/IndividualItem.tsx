@@ -10,6 +10,8 @@ import {
 import { Button } from "../ui/button";
 import { memo, useRef } from "react";
 import { calculatePriceWithMarkupAndVAT } from "@/utils/price-with-markup";
+import { uploadFile } from "@/services/upload.service";
+import { toast } from "sonner";
 
 function IndividualItem({ item }: { item: any }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -18,8 +20,21 @@ function IndividualItem({ item }: { item: any }) {
     inputRef.current?.click();
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.files);
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      e.preventDefault();
+      if (!e.target.files) return;
+      const file = e.target.files[0];
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      await uploadFile(item.orderItemId, formData);
+
+      toast("File Uploaded");
+    } catch (error) {
+      toast("File upload failed please try again later");
+    }
   };
 
   return (
