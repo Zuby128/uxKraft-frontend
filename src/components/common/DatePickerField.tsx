@@ -26,8 +26,8 @@ function DatePickerField({
 
   const selectedDate = useMemo(() => {
     if (!value) return undefined;
-    const date = new Date(value);
-    return isNaN(date.getTime()) ? undefined : date;
+    const [yyyy, mm, dd] = value.split("-").map(Number);
+    return new Date(yyyy, mm - 1, dd);
   }, [value]);
 
   const formattedDate = useMemo(() => {
@@ -60,10 +60,20 @@ function DatePickerField({
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             mode="single"
+            disabled={disabled}
             selected={selectedDate}
             captionLayout="dropdown"
             onSelect={(date) => {
-              onChange(date ? date.toISOString().slice(0, 10) : undefined);
+              if (!date) {
+                onChange(undefined);
+                return;
+              }
+
+              const yyyy = date.getFullYear();
+              const mm = String(date.getMonth() + 1).padStart(2, "0");
+              const dd = String(date.getDate()).padStart(2, "0");
+
+              onChange(`${yyyy}-${mm}-${dd}`);
               setOpen(false);
             }}
           />

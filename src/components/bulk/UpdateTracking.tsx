@@ -1,195 +1,96 @@
 import { Label } from "../ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "../ui/textarea";
 import DatePickerField from "../common/DatePickerField";
-import { useState } from "react";
+import { useTimeline } from "@/context/TimelineContext";
 
 function UpdateTracking() {
-  const [stats, setStats] = useState({
-    planning: {
-      poApprovalDate: null,
-      hotelNeedByDate: null,
-      expectedDelivery: null,
-    },
-    production: {
-      cfaShopsSend: null,
-      cfaShopsApproved: null,
-      cfaShopsDelivered: null,
-    },
-    logistics: {
-      orderedDate: null,
-      shippedDate: null,
-      deliveredDate: null,
-      shippingNotes: "",
-    },
-  });
-
-  const onUpdatePlanning = async (date: any, diff: string, sub: string) => {
-    setStats((prev) => ({ ...prev, [diff]: { [sub]: date } }));
-  };
-
-  console.log(stats);
+  const { state, updateField } = useTimeline();
 
   return (
     <div className="flex flex-col gap-4">
+      {/* ------------ Planning --------------- */}
       <div className="p-4 bg-white">
         <div className="font-bold mb-4">Planning & Requirements</div>
         <div className="grid grid-cols-3 gap-4">
           <DatePickerField
-            label={"PO Approval Date"}
-            value={(stats?.planning?.poApprovalDate as any) ?? null}
+            label="PO Approval Date"
+            value={state.planning.poApprovalDate as any}
+            onChange={(date) => updateField("planning", "poApprovalDate", date)}
+          />
+          <DatePickerField
+            label="Hotel Need By Date"
+            value={state.planning.hotelNeedByDate as any}
             onChange={(date) =>
-              onUpdatePlanning(date, "planning", "poApprovalDate")
+              updateField("planning", "hotelNeedByDate", date)
             }
           />
           <DatePickerField
-            label={"Hotel Need By Date"}
-            value={(stats?.planning?.hotelNeedByDate as any) ?? null}
+            label="Expected Delivery"
+            value={state.planning.expectedDelivery as any}
             onChange={(date) =>
-              onUpdatePlanning(date, "planning", "hotelNeedByDate")
-            }
-          />
-          <DatePickerField
-            label={"Expected Delivery"}
-            value={(stats?.planning?.expectedDelivery as any) ?? null}
-            onChange={(date) =>
-              onUpdatePlanning(date, "planning", "expectedDelivery")
+              updateField("planning", "expectedDelivery", date)
             }
           />
         </div>
       </div>
 
-      {/* ------------ production & shop --------------- */}
+      {/* ------------ Production --------------- */}
       <div className="p-4 bg-white">
         <div className="font-bold mb-4">Production & Shop</div>
         <div className="grid grid-cols-3 gap-4">
-          <div>
-            <Label className="mb-2">CFA/Shops Send</Label>
-            <Select>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a fruit" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Fruits</SelectLabel>
-                  <SelectItem value="apple">Apple</SelectItem>
-                  <SelectItem value="banana">Banana</SelectItem>
-                  <SelectItem value="blueberry">Blueberry</SelectItem>
-                  <SelectItem value="grapes">Grapes</SelectItem>
-                  <SelectItem value="pineapple">Pineapple</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label className="mb-2">CFA/Shops Approved</Label>
-            <Select>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a fruit" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Fruits</SelectLabel>
-                  <SelectItem value="apple">Apple</SelectItem>
-                  <SelectItem value="banana">Banana</SelectItem>
-                  <SelectItem value="blueberry">Blueberry</SelectItem>
-                  <SelectItem value="grapes">Grapes</SelectItem>
-                  <SelectItem value="pineapple">Pineapple</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label className="mb-2">CFA/Shops Delivered</Label>
-            <Select>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a fruit" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Fruits</SelectLabel>
-                  <SelectItem value="apple">Apple</SelectItem>
-                  <SelectItem value="banana">Banana</SelectItem>
-                  <SelectItem value="blueberry">Blueberry</SelectItem>
-                  <SelectItem value="grapes">Grapes</SelectItem>
-                  <SelectItem value="pineapple">Pineapple</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
+          <DatePickerField
+            label="CFA/Shops Send"
+            value={state.production.cfaShopsSend as any}
+            onChange={(date) => updateField("production", "cfaShopsSend", date)}
+          />
+          <DatePickerField
+            label="CFA/Shops Approved"
+            value={state.production.cfaShopsApproved as any}
+            onChange={(date) =>
+              updateField("production", "cfaShopsApproved", date)
+            }
+          />
+          <DatePickerField
+            label="CFA/Shops Delivered"
+            value={state.production.cfaShopsDelivered as any}
+            onChange={(date) =>
+              updateField("production", "cfaShopsDelivered", date)
+            }
+          />
         </div>
       </div>
 
-      {/* ------------ shipping --------------- */}
+      {/* ------------ Shipping --------------- */}
       <div className="p-4 bg-white mb-4">
         <div className="font-bold mb-4">Shipping</div>
         <div className="grid grid-cols-3 gap-4">
-          <div>
-            <Label className="mb-2">Ordered Date</Label>
-            <Select>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a fruit" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Fruits</SelectLabel>
-                  <SelectItem value="apple">Apple</SelectItem>
-                  <SelectItem value="banana">Banana</SelectItem>
-                  <SelectItem value="blueberry">Blueberry</SelectItem>
-                  <SelectItem value="grapes">Grapes</SelectItem>
-                  <SelectItem value="pineapple">Pineapple</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label className="mb-2">Shipped Date</Label>
-            <Select>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a fruit" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Fruits</SelectLabel>
-                  <SelectItem value="apple">Apple</SelectItem>
-                  <SelectItem value="banana">Banana</SelectItem>
-                  <SelectItem value="blueberry">Blueberry</SelectItem>
-                  <SelectItem value="grapes">Grapes</SelectItem>
-                  <SelectItem value="pineapple">Pineapple</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label className="mb-2">Delivered Date</Label>
-            <Select>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a fruit" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Fruits</SelectLabel>
-                  <SelectItem value="apple">Apple</SelectItem>
-                  <SelectItem value="banana">Banana</SelectItem>
-                  <SelectItem value="blueberry">Blueberry</SelectItem>
-                  <SelectItem value="grapes">Grapes</SelectItem>
-                  <SelectItem value="pineapple">Pineapple</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
+          <DatePickerField
+            label="Ordered Date"
+            value={state.logistics.orderedDate as any}
+            onChange={(date) => updateField("logistics", "orderedDate", date)}
+          />
+          <DatePickerField
+            label="Shipped Date"
+            value={state.logistics.shippedDate as any}
+            onChange={(date) => updateField("logistics", "shippedDate", date)}
+          />
+          <DatePickerField
+            label="Delivered Date"
+            value={state.logistics.deliveredDate as any}
+            onChange={(date) => updateField("logistics", "deliveredDate", date)}
+          />
         </div>
+
         <div className="mt-6">
           <Label className="mb-2">Shipping Notes</Label>
-          <Textarea placeholder="Delicate product" rows={5} />
+          <Textarea
+            placeholder="Delicate product"
+            rows={5}
+            value={state.logistics.shippingNotes}
+            onChange={(e) =>
+              updateField("logistics", "shippingNotes", e.target.value)
+            }
+          />
         </div>
       </div>
     </div>

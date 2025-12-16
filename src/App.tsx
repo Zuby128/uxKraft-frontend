@@ -26,7 +26,7 @@ function App() {
     return () => {
       isMounted = false;
     };
-  }, []); // initial fonksiyonunu dependency'den çıkar
+  }, []);
 
   if (isLoading) {
     return (
