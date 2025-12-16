@@ -2,7 +2,7 @@ import { getCategories } from "@/services/category.service";
 import { create } from "zustand";
 
 export interface Category {
-  id: number;
+  categoryId: number;
   name: string;
 }
 

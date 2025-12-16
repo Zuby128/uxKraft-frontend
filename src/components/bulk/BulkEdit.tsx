@@ -59,8 +59,11 @@ function BulkEdit() {
               <SelectGroup>
                 <SelectLabel>Categories</SelectLabel>
                 {categories.map((v) => (
-                  <SelectItem key={v.id} value={v.id.toString()}>
-                    {v.name}
+                  <SelectItem
+                    key={v?.categoryId}
+                    value={v?.categoryId.toString()}
+                  >
+                    {v?.name}
                   </SelectItem>
                 ))}
               </SelectGroup>

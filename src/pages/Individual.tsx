@@ -16,12 +16,11 @@ function Individual() {
   const { selectItem } = useOrderItemStore();
 
   const { items, loading, search, fetchAll } = useOrderItemsStore();
-  const { vendors, fetchVendors } = useVendorsStore();
+  const { vendors } = useVendorsStore();
 
   useEffect(() => {
     fetchAll();
-    fetchVendors();
-  }, [fetchAll, fetchVendors]);
+  }, [fetchAll]);
 
   const handleExport = useCallback(() => {
     const csvData = mapOrderItemsToCsv(items);
