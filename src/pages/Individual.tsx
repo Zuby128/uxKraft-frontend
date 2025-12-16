@@ -1,15 +1,19 @@
-import { useEffect, useMemo, useCallback } from "react";
+import { useEffect, useMemo, useCallback, lazy, Suspense } from "react";
 import { DataTable } from "@/components/common/DataTable";
 import TableSearch from "@/components/common/TableSearch";
-import IndividualItemDetails from "@/components/individual/IndividualItemDetails";
 import { useRightSidebarStore } from "@/store/RightSidebarStore";
 import { useOrderItemsStore } from "@/store/orderItems.store";
 import { useVendorsStore } from "@/store/vendorsStore";
 import { useOrderItemStore } from "@/store/order-item.store";
 import { exportToCsv } from "@/utils/export-to-csv";
 import { mapOrderItemsToCsv } from "@/utils/json-to-csv";
+import Spinning from "@/components/common/Spinning";
 
 const PHASES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+
+const IndividualItemDetails = lazy(
+  () => import("@/components/individual/IndividualItemDetails")
+);
 
 function Individual() {
   const { openBar } = useRightSidebarStore();
@@ -38,7 +42,9 @@ function Individual() {
           {row?.item?.itemName} #{row?.item?.itemId}
           <span className="text-sm underline ml-4">Edit</span>
         </>,
-        <IndividualItemDetails />
+        <Suspense fallback={<Spinning />}>
+          <IndividualItemDetails />
+        </Suspense>
       );
     },
     [openBar, selectItem]

@@ -1,6 +1,4 @@
-import { useEffect, useMemo, useCallback } from "react";
-import BulkEdit from "@/components/bulk/BulkEdit";
-import UpdateTracking from "@/components/bulk/UpdateTracking";
+import { useEffect, useMemo, useCallback, lazy, Suspense } from "react";
 import { DataTable } from "@/components/common/DataTable";
 import { EditTable } from "@/components/common/EditTable";
 import TableSearch from "@/components/common/TableSearch";
@@ -17,8 +15,12 @@ import { useVendorsStore } from "@/store/vendorsStore";
 import { exportToCsv } from "@/utils/export-to-csv";
 import { mapOrderItemsToCsv } from "@/utils/json-to-csv";
 import { toast } from "sonner";
+import Spinning from "@/components/common/Spinning";
 
 const PHASES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+
+const BulkEdit = lazy(() => import("@/components/bulk/BulkEdit"));
+const UpdateTracking = lazy(() => import("@/components/bulk/UpdateTracking"));
 
 function Bulk() {
   const { openBar } = useRightSidebarStore();
@@ -243,9 +245,21 @@ function Bulk() {
       />
 
       <EditTable
-        onBulkEdit={() => openBulkSidebar("Bulk Edit", <BulkEdit />)}
+        onBulkEdit={() =>
+          openBulkSidebar(
+            "Bulk Edit",
+            <Suspense fallback={<Spinning />}>
+              <BulkEdit />
+            </Suspense>
+          )
+        }
         onUpdateTracking={() =>
-          openTrackingSidebar("Update Tracking", <UpdateTracking />)
+          openTrackingSidebar(
+            "Update Tracking",
+            <Suspense fallback={<Spinning />}>
+              <UpdateTracking />
+            </Suspense>
+          )
         }
         onCreatePO={() => {}}
         onDelete={() => {}}
