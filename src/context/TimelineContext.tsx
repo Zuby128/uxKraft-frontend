@@ -1,104 +1,82 @@
-import { createContext, useContext, useReducer, type ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 
 type TimelineState = {
+  logistics: {
+    orderedDate?: Date | null;
+    shippedDate?: Date | null;
+    deliveredDate?: Date | null;
+    shippingNotes?: string;
+  };
   planning: {
-    poApprovalDate: Date | null;
-    hotelNeedByDate: Date | null;
-    expectedDelivery: Date | null;
+    poApprovalDate?: Date | null;
+    hotelNeedByDate?: Date | null;
+    expectedDelivery?: Date | null;
   };
   production: {
-    cfaShopsSend: Date | null;
-    cfaShopsApproved: Date | null;
-    cfaShopsDelivered: Date | null;
-  };
-  logistics: {
-    orderedDate: Date | null;
-    shippedDate: Date | null;
-    deliveredDate: Date | null;
-    shippingNotes: string;
+    cfaShopsSend?: Date | null;
+    cfaShopsApproved?: Date | null;
+    cfaShopsDelivered?: Date | null;
   };
 };
 
-const initialState: TimelineState = {
-  planning: {
-    poApprovalDate: null,
-    hotelNeedByDate: null,
-    expectedDelivery: null,
-  },
-  production: {
-    cfaShopsSend: null,
-    cfaShopsApproved: null,
-    cfaShopsDelivered: null,
-  },
-  logistics: {
-    orderedDate: null,
-    shippedDate: null,
-    deliveredDate: null,
-    shippingNotes: "",
-  },
+type UpdateFieldPayload = {
+  section: keyof TimelineState;
+  field: string;
+  value: any;
 };
 
-type Action =
-  | {
-      type: "UPDATE_FIELD";
-      payload: {
-        section: keyof TimelineState;
-        field: string;
-        value: any;
-      };
-    }
-  | { type: "RESET" };
-
-function reducer(state: TimelineState, action: Action): TimelineState {
-  switch (action.type) {
-    case "UPDATE_FIELD": {
-      const { section, field, value } = action.payload;
-
-      return {
-        ...state,
-        [section]: {
-          ...state[section],
-          [field]: value,
-        },
-      };
-    }
-
-    case "RESET":
-      return initialState;
-
-    default:
-      return state;
-  }
-}
-
-type ContextValue = {
+type TimelineContextValue = {
   state: TimelineState;
-  updateField: (
-    section: keyof TimelineState,
-    field: string,
-    value: any
-  ) => void;
+
+  /** 🔹 form input’ları için */
+  updateField: (payload: UpdateFieldPayload) => void;
+
+  /** 🔹 sidebar save için */
+  getState: () => TimelineState;
+
   reset: () => void;
 };
 
-const TimelineContext = createContext<ContextValue | null>(null);
+const defaultState: TimelineState = {
+  logistics: {},
+  planning: {},
+  production: {},
+};
 
-export function TimelineProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, initialState);
+const TimelineContext = createContext<TimelineContextValue | null>(null);
 
-  const updateField = (
-    section: keyof TimelineState,
-    field: string,
-    value: any
-  ) => {
-    dispatch({
-      type: "UPDATE_FIELD",
-      payload: { section, field, value },
-    });
-  };
+export const TimelineProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [state, setState] = useState<TimelineState>(defaultState);
+
+  /** 🔥 latest snapshot */
+  const stateRef = useRef(state);
+  stateRef.current = state;
+
+  const getState = useCallback(() => stateRef.current, []);
+
+  const updateField = useCallback(
+    ({ section, field, value }: UpdateFieldPayload) => {
+      setState((prev) => ({
+        ...prev,
+        [section]: {
+          ...prev[section],
+          [field]: value,
+        },
+      }));
+    },
+    []
+  );
 
   const reset = () => {
-    dispatch({ type: "RESET" });
+    setState(defaultState);
   };
 
   return (
@@ -106,20 +84,19 @@ export function TimelineProvider({ children }: { children: ReactNode }) {
       value={{
         state,
         updateField,
+        getState,
         reset,
       }}
     >
       {children}
     </TimelineContext.Provider>
   );
-}
+};
 
-export function useTimeline() {
-  const context = useContext(TimelineContext);
-
-  if (!context) {
-    throw new Error("useTimeline must be used inside TimelineProvider");
+export const useTimeline = () => {
+  const ctx = useContext(TimelineContext);
+  if (!ctx) {
+    throw new Error("useTimeline must be used within TimelineProvider");
   }
-
-  return context;
-}
+  return ctx;
+};

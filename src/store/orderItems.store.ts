@@ -12,17 +12,20 @@ const buildMap = (items: OrderItem[]) =>
   }, {} as Record<number, OrderItem>);
 
 interface OrderItemsState {
-  items: any[];
+  items: OrderItem[];
   mapObject: Record<number, OrderItem>;
 
   selectedItemIds: number[];
   setSelectedItemIds: (ids: number[]) => void;
+  clearSelectedItemIds: () => void;
+
   meta: {
     page: number;
     limit: number;
     total: number;
     totalPages: number;
   };
+
   loading: boolean;
   error: string | null;
 
@@ -33,25 +36,32 @@ interface OrderItemsState {
     phase?: string;
   }) => Promise<void>;
 
-  updateList: (id: number, item: OrderItem) => void;
+  updateList: (id: number, payload: Partial<OrderItem>) => void;
 }
 
-export const useOrderItemsStore = create<OrderItemsState>((set, get) => ({
+export const useOrderItemsStore = create<OrderItemsState>((set) => ({
   items: [],
   mapObject: {},
+
   selectedItemIds: [],
+
+  setSelectedItemIds: (ids) => {
+    set({ selectedItemIds: Array.from(new Set(ids)) });
+  },
+
+  clearSelectedItemIds: () => {
+    set({ selectedItemIds: [] });
+  },
+
   meta: {
     page: 1,
     limit: 10,
     total: 0,
     totalPages: 0,
   },
+
   loading: false,
   error: null,
-
-  setSelectedItemIds: (ids: number[]) => {
-    set({ selectedItemIds: ids });
-  },
 
   fetchAll: async () => {
     try {
@@ -64,7 +74,7 @@ export const useOrderItemsStore = create<OrderItemsState>((set, get) => ({
         meta: res.meta,
         loading: false,
       });
-    } catch (e) {
+    } catch {
       set({ error: "Order items alınamadı", loading: false });
     }
   },
@@ -92,13 +102,13 @@ export const useOrderItemsStore = create<OrderItemsState>((set, get) => ({
 
   updateList: (id, payload) => {
     set((state) => {
-      const updatedItems = state.items.map((item) =>
+      const items = state.items.map((item) =>
         item.orderItemId === id ? { ...item, ...payload } : item
       );
 
       return {
-        items: updatedItems,
-        mapObject: buildMap(updatedItems),
+        items,
+        mapObject: buildMap(items),
       };
     });
   },

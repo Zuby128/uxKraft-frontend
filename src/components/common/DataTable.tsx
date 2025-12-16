@@ -18,81 +18,69 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-interface DataTableProps<TData> {
+interface DataTableProps<TData extends { orderItemId: number }> {
   columns: {
-    key: keyof TData | "select";
+    key: keyof TData;
     header: string;
     render?: (row: TData) => React.ReactNode;
   }[];
   data: TData[];
   selectable?: boolean;
-  selectedElements?: (idx: number[]) => void;
+  selectedElements?: (ids: number[]) => void;
 }
 
-const range = (n: number): number[] => {
-  if (n < 1) {
-    return [];
-  } else {
-    return Array.from({ length: n }, (_, i) => i + 1);
-  }
-};
+const range = (n: number): number[] =>
+  n < 1 ? [] : Array.from({ length: n }, (_, i) => i + 1);
 
-export function DataTable<TData extends Record<string, any>>({
+export function DataTable<TData extends { orderItemId: number }>({
   columns,
   data,
   selectable = true,
   selectedElements,
 }: DataTableProps<TData>) {
+  /** selected orderItemId'ler */
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
 
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(3);
 
   const pageCount = Math.ceil(data.length / pageSize);
+
   const paginatedData = useMemo(() => {
     const start = pageIndex * pageSize;
     return data.slice(start, start + pageSize);
   }, [data, pageIndex, pageSize]);
 
-  const selectedCount = selectedRows.size;
-
-  const toggleAllPage = () => {
-    if (selectedCount === paginatedData.length) {
-      setSelectedRows((prev) => {
-        const next = new Set(prev);
-        paginatedData.forEach((_, idx) =>
-          next.delete(pageIndex * pageSize + idx)
-        );
-        selectedElements && selectedElements(Array.from(next) || []);
-        return next;
-      });
-    } else {
-      setSelectedRows((prev) => {
-        const next = new Set(prev);
-        paginatedData.forEach((_, idx) => next.add(pageIndex * pageSize + idx));
-        selectedElements && selectedElements(Array.from(next) || []);
-        return next;
-      });
-    }
-  };
-
-  const toggleRow = (index: number) => {
+  const toggleRow = (rowId: number) => {
     setSelectedRows((prev) => {
       const next = new Set(prev);
-      if (next.has(index)) next.delete(index);
-      else next.add(index);
+      next.has(rowId) ? next.delete(rowId) : next.add(rowId);
+      selectedElements?.(Array.from(next));
+      return next;
+    });
+  };
 
-      selectedElements && selectedElements(Array.from(next) || []);
+  const toggleAllPage = () => {
+    const pageIds = paginatedData.map((r) => r.orderItemId);
 
+    setSelectedRows((prev) => {
+      const next = new Set(prev);
+      const allSelected = pageIds.every((id) => next.has(id));
+
+      if (allSelected) {
+        pageIds.forEach((id) => next.delete(id));
+      } else {
+        pageIds.forEach((id) => next.add(id));
+      }
+
+      selectedElements?.(Array.from(next));
       return next;
     });
   };
 
   const isAllPageSelected =
     paginatedData.length > 0 &&
-    paginatedData.every((_, idx) =>
-      selectedRows.has(pageIndex * pageSize + idx)
-    );
+    paginatedData.every((r) => selectedRows.has(r.orderItemId));
 
   return (
     <div className="space-y-4 min-w-xl text-xs">
@@ -118,20 +106,17 @@ export function DataTable<TData extends Record<string, any>>({
 
           <TableBody>
             {paginatedData.length ? (
-              paginatedData.map((row, rowIdx) => {
-                const globalIndex = pageIndex * pageSize + rowIdx;
-                const isSelected = selectedRows.has(globalIndex);
+              paginatedData.map((row) => {
+                const rowId = row.orderItemId;
+                const isSelected = selectedRows.has(rowId);
 
                 return (
-                  <TableRow
-                    key={globalIndex}
-                    data-state={isSelected && "selected"}
-                  >
+                  <TableRow key={rowId} data-state={isSelected && "selected"}>
                     {selectable && (
                       <TableCell>
                         <Checkbox
                           checked={isSelected}
-                          onCheckedChange={() => toggleRow(globalIndex)}
+                          onCheckedChange={() => toggleRow(rowId)}
                           aria-label="select row"
                         />
                       </TableCell>
@@ -148,7 +133,7 @@ export function DataTable<TData extends Record<string, any>>({
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length + 1}
+                  colSpan={columns.length + (selectable ? 1 : 0)}
                   className="h-24 text-center"
                 >
                   Data not found.
@@ -159,39 +144,36 @@ export function DataTable<TData extends Record<string, any>>({
         </Table>
       </div>
 
+      {/* Pagination */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Rows per page</span>
-            <Select
-              value={`${pageSize}`}
-              onValueChange={(v) => {
-                setPageSize(Number(v));
-                setPageIndex(0);
-              }}
-            >
-              <SelectTrigger className="w-20">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {[3, 5, 10, 20].map((size) => (
-                  <SelectItem key={size} value={`${size}`}>
-                    {size}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">Rows per page</span>
+          <Select
+            value={`${pageSize}`}
+            onValueChange={(v) => {
+              setPageSize(Number(v));
+              setPageIndex(0);
+            }}
+          >
+            <SelectTrigger className="w-20">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {[3, 5, 10, 20].map((size) => (
+                <SelectItem key={size} value={`${size}`}>
+                  {size}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="flex items-center">
           <span className="mr-2">
             {pageSize * pageIndex + 1} -{" "}
-            {pageSize * (pageIndex + 1) > data.length
-              ? data.length
-              : pageSize * (pageIndex + 1)}{" "}
-            of {data.length}
+            {Math.min(pageSize * (pageIndex + 1), data.length)} of {data.length}
           </span>
+
           <Button
             variant="ghost"
             size="sm"
@@ -200,26 +182,23 @@ export function DataTable<TData extends Record<string, any>>({
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          {range(pageSize / data.length < 1 ? 1 : data.length / pageSize).map(
-            (v) => (
-              <Button
-                key={`v${v}`}
-                variant="ghost"
-                className="flex gap-1 font-bold"
-                onClick={() => setPageIndex(v - 1)}
-                style={
-                  pageIndex + 1 === v
-                    ? {
-                        color: "red",
-                        textDecoration: "underline",
-                      }
-                    : {}
-                }
-              >
-                {v}
-              </Button>
-            )
-          )}
+
+          {range(pageCount).map((v) => (
+            <Button
+              key={v}
+              variant="ghost"
+              className="font-bold"
+              onClick={() => setPageIndex(v - 1)}
+              style={
+                pageIndex + 1 === v
+                  ? { color: "red", textDecoration: "underline" }
+                  : {}
+              }
+            >
+              {v}
+            </Button>
+          ))}
+
           <Button
             variant="ghost"
             size="sm"
