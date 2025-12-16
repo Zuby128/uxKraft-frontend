@@ -142,7 +142,7 @@ function UpdateTracking() {
             onChange={(e) =>
               updateField({
                 section: "logistics",
-                field: "deliveredDate",
+                field: "shippingNotes",
                 value: e.target.value,
               })
             }

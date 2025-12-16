@@ -19,7 +19,7 @@ import { toast } from "sonner";
 
 function Bulk() {
   const { openBar } = useRightSidebarStore();
-  const { getState } = useTimeline();
+  const { getState, reset } = useTimeline();
 
   const phase = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
@@ -31,6 +31,7 @@ function Bulk() {
     selectedItemIds,
     setSelectedItemIds,
     clearSelectedItemIds,
+    updateList,
   } = useOrderItemsStore();
 
   const { vendors, fetchVendors } = useVendorsStore();
@@ -106,38 +107,44 @@ function Bulk() {
       return;
     }
     const state = getState();
-    console.log("***********", state);
 
-    // const latestState = useTimeline.getState();
+    try {
+      await patchBulkOrderLogistics({
+        orderItemIds: selectedItemIds,
+        orderedDate: state.logistics.orderedDate as any,
+        shippedDate: state.logistics.shippedDate as any,
+        deliveredDate: state.logistics.deliveredDate as any,
+        shippingNotes: state.logistics.shippingNotes as any,
+      });
 
-    // try {
-    //   await patchBulkOrderLogistics({
-    //     orderItemIds: selectedItemIds,
-    //     orderedDate: state.logistics.orderedDate as any,
-    //     shippedDate: state.logistics.shippedDate as any,
-    //     deliveredDate: state.logistics.deliveredDate as any,
-    //     shippingNotes: state.logistics.shippingNotes as any,
-    //   });
+      await patchBulkOrderPlanning({
+        orderItemIds: selectedItemIds,
+        poApprovalDate: state.planning.poApprovalDate as any,
+        hotelNeedByDate: state.planning.hotelNeedByDate as any,
+        expectedDelivery: state.planning.expectedDelivery as any,
+      });
 
-    //   await patchBulkOrderPlanning({
-    //     orderItemIds: selectedItemIds,
-    //     poApprovalDate: state.planning.poApprovalDate as any,
-    //     hotelNeedByDate: state.planning.hotelNeedByDate as any,
-    //     expectedDelivery: state.planning.expectedDelivery as any,
-    //   });
+      await patchBulkOrderProduction({
+        orderItemIds: selectedItemIds,
+        cfaShopsSend: state.production.cfaShopsSend as any,
+        cfaShopsApproved: state.production.cfaShopsApproved as any,
+        cfaShopsDelivered: state.production.cfaShopsDelivered as any,
+      });
 
-    //   await patchBulkOrderProduction({
-    //     orderItemIds: selectedItemIds,
-    //     cfaShopsSend: state.production.cfaShopsSend as any,
-    //     cfaShopsApproved: state.production.cfaShopsApproved as any,
-    //     cfaShopsDelivered: state.production.cfaShopsDelivered as any,
-    //   });
+      selectedItemIds.forEach((orderItemId) => {
+        updateList(orderItemId, {
+          logistics: state.logistics,
+          planning: state.planning,
+          production: state.production,
+        } as any);
+      });
 
-    //   toast("Items Updated");
-    //   clearSelectedItemIds();
-    // } catch {
-    //   toast("Items Not Updated, please try again later");
-    // }
+      toast("Items Updated");
+      clearSelectedItemIds();
+      reset();
+    } catch {
+      toast("Items Not Updated, please try again later");
+    }
   };
 
   const openBulkSidebar = (title: string, content: any) => {
