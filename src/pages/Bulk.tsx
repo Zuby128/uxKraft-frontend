@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useCallback } from "react";
 import BulkEdit from "@/components/bulk/BulkEdit";
 import UpdateTracking from "@/components/bulk/UpdateTracking";
 import { DataTable } from "@/components/common/DataTable";
@@ -18,11 +18,11 @@ import { exportToCsv } from "@/utils/export-to-csv";
 import { mapOrderItemsToCsv } from "@/utils/json-to-csv";
 import { toast } from "sonner";
 
+const PHASES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+
 function Bulk() {
   const { openBar } = useRightSidebarStore();
   const { getState, reset } = useTimeline();
-
-  const phase = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
   const {
     items,
@@ -41,97 +41,54 @@ function Bulk() {
   useEffect(() => {
     fetchAll();
     fetchVendors();
-    clearSelectedItemIds(); // sayfa açılınca temiz başla
-  }, [fetchAll, fetchVendors, clearSelectedItemIds]);
+  }, [fetchAll, fetchVendors]);
 
-  const handleExport = () => {
+  useEffect(() => {
+    clearSelectedItemIds();
+  }, [clearSelectedItemIds]);
+
+  const handleExport = useCallback(() => {
     const csvData = mapOrderItemsToCsv(items);
     exportToCsv("order-items.csv", csvData);
-  };
+  }, [items]);
 
-  const columns = useMemo(
-    () => [
-      { key: "orderItemId", header: "Order #" },
-      {
-        key: "item",
-        header: "Item #",
-        render: (row: any) => row?.item?.itemId,
-      },
-      {
-        key: "spec",
-        header: "Spec #",
-        render: (row: any) => row?.item?.specNo,
-      },
-      {
-        key: "name",
-        header: "Item Name",
-        render: (row: any) => row?.item?.itemName,
-      },
-      {
-        key: "vendor",
-        header: "Vendor",
-        render: (row: any) => row?.vendor?.vendorName,
-      },
-      {
-        key: "shipTo",
-        header: "Ship To",
-        render: (row: any) => (
-          <div className="truncate max-w-[150px]">{row?.customer?.name}</div>
-        ),
-      },
-      { key: "quantity", header: "Qty" },
-      { key: "phase", header: "Phase" },
-      {
-        key: "price",
-        header: "Price",
-        render: (row: any) => row?.totalPrice / 100,
-      },
-      {
-        key: "shipNotes",
-        header: "Ship Notes",
-        render: (row: any) => (
-          <div className="truncate max-w-[150px]">
-            {row?.logistics?.shippingNotes}
-          </div>
-        ),
-      },
-    ],
-    []
+  const onSelectedElements = useCallback(
+    (ids: number[]) => {
+      setSelectedItemIds(ids);
+    },
+    [setSelectedItemIds]
   );
 
-  const onSelectedElements = (ids: number[]) => {
-    setSelectedItemIds(ids);
-  };
-
-  const onBulkEditAction = async () => {
+  const onBulkEditAction = useCallback(async () => {
     if (!selectedItemIds.length) {
       toast("No items selected");
       return;
     }
+
     const state = getState();
 
     try {
-      await patchBulkOrderLogistics({
-        orderItemIds: selectedItemIds,
-        orderedDate: state.logistics.orderedDate as any,
-        shippedDate: state.logistics.shippedDate as any,
-        deliveredDate: state.logistics.deliveredDate as any,
-        shippingNotes: state.logistics.shippingNotes as any,
-      });
-
-      await patchBulkOrderPlanning({
-        orderItemIds: selectedItemIds,
-        poApprovalDate: state.planning.poApprovalDate as any,
-        hotelNeedByDate: state.planning.hotelNeedByDate as any,
-        expectedDelivery: state.planning.expectedDelivery as any,
-      });
-
-      await patchBulkOrderProduction({
-        orderItemIds: selectedItemIds,
-        cfaShopsSend: state.production.cfaShopsSend as any,
-        cfaShopsApproved: state.production.cfaShopsApproved as any,
-        cfaShopsDelivered: state.production.cfaShopsDelivered as any,
-      });
+      await Promise.all([
+        patchBulkOrderLogistics({
+          orderItemIds: selectedItemIds,
+          orderedDate: state.logistics.orderedDate as any,
+          shippedDate: state.logistics.shippedDate as any,
+          deliveredDate: state.logistics.deliveredDate as any,
+          shippingNotes: state.logistics.shippingNotes as any,
+        }),
+        patchBulkOrderPlanning({
+          orderItemIds: selectedItemIds,
+          poApprovalDate: state.planning.poApprovalDate as any,
+          hotelNeedByDate: state.planning.hotelNeedByDate as any,
+          expectedDelivery: state.planning.expectedDelivery as any,
+        }),
+        patchBulkOrderProduction({
+          orderItemIds: selectedItemIds,
+          cfaShopsSend: state.production.cfaShopsSend as any,
+          cfaShopsApproved: state.production.cfaShopsApproved as any,
+          cfaShopsDelivered: state.production.cfaShopsDelivered as any,
+        }),
+      ]);
 
       selectedItemIds.forEach((orderItemId) => {
         updateList(orderItemId, {
@@ -147,28 +104,21 @@ function Bulk() {
     } catch {
       toast("Items Not Updated, please try again later");
     }
-  };
+  }, [selectedItemIds, getState, updateList, clearSelectedItemIds, reset]);
 
-  const openTrackingSidebar = (title: string, content: any) => {
-    openBar(title, content, `${selectedItemIds.length} items selected`, {
-      text: "Save Changes",
-      onClick: onBulkEditAction,
-    });
-  };
-
-  const onEditItemAction = async () => {
+  const onEditItemAction = useCallback(async () => {
     if (!selectedItemIds.length) {
       toast("No items selected");
       return;
     }
 
-    const timelineState = getState();
-    const bulk = timelineState.bulkEdit;
+    const { bulkEdit } = getState();
+    if (!bulkEdit) return;
 
     const itemIds = Array.from(
       new Set(
         selectedItemIds
-          .map((orderItemId) => mapObject[orderItemId]?.item?.itemId)
+          .map((id) => mapObject[id]?.item?.itemId)
           .filter((id): id is number => typeof id === "number")
       )
     );
@@ -181,21 +131,25 @@ function Bulk() {
     try {
       await patchBulkItems({
         itemIds,
-        ...(bulk?.categoryId !== undefined &&
-          bulk?.categoryId !== null && { categoryId: bulk.categoryId }),
-        ...(bulk?.location?.trim() && { location: bulk.location }),
-        ...(bulk?.shipFrom?.trim() && { shipFrom: bulk.shipFrom }),
-        ...(bulk?.notes?.trim() && { notes: bulk.notes }),
+        ...(bulkEdit.categoryId != null && { categoryId: bulkEdit.categoryId }),
+        ...(bulkEdit.location?.trim() && { location: bulkEdit.location }),
+        ...(bulkEdit.shipFrom?.trim() && { shipFrom: bulkEdit.shipFrom }),
+        ...(bulkEdit.notes?.trim() && { notes: bulkEdit.notes }),
       });
 
       selectedItemIds.forEach((orderItemId) => {
+        const currentItem = mapObject[orderItemId]?.item;
+        if (!currentItem) return;
+
         updateList(orderItemId, {
           item: {
-            ...mapObject[orderItemId].item,
-            ...(bulk?.categoryId != null && { categoryId: bulk.categoryId }),
-            ...(bulk?.location && { location: bulk.location }),
-            ...(bulk?.shipFrom && { shipFrom: bulk.shipFrom }),
-            ...(bulk?.notes && { notes: bulk.notes }),
+            ...currentItem,
+            ...(bulkEdit.categoryId != null && {
+              categoryId: bulkEdit.categoryId,
+            }),
+            ...(bulkEdit.location && { location: bulkEdit.location }),
+            ...(bulkEdit.shipFrom && { shipFrom: bulkEdit.shipFrom }),
+            ...(bulkEdit.notes && { notes: bulkEdit.notes }),
           },
         } as any);
       });
@@ -207,20 +161,82 @@ function Bulk() {
       console.error(error);
       toast("Items Not Updated, please try again later");
     }
-  };
+  }, [
+    selectedItemIds,
+    getState,
+    mapObject,
+    updateList,
+    clearSelectedItemIds,
+    reset,
+  ]);
 
-  const openBulkSidebar = (title: string, content: any) => {
-    openBar(title, content, `${selectedItemIds.length} items selected`, {
-      text: "Save Changes",
-      onClick: onEditItemAction,
-    });
-  };
+  const openTrackingSidebar = useCallback(
+    (title: string, content: React.ReactNode) => {
+      openBar(title, content, `${selectedItemIds.length} items selected`, {
+        text: "Save Changes",
+        onClick: onBulkEditAction,
+      });
+    },
+    [openBar, selectedItemIds.length, onBulkEditAction]
+  );
+
+  const openBulkSidebar = useCallback(
+    (title: string, content: React.ReactNode) => {
+      openBar(title, content, `${selectedItemIds.length} items selected`, {
+        text: "Save Changes",
+        onClick: onEditItemAction,
+      });
+    },
+    [openBar, selectedItemIds.length, onEditItemAction]
+  );
+
+  const columns = useMemo(
+    () => [
+      { key: "orderItemId", header: "Order #" },
+      { key: "item", header: "Item #", render: (r: any) => r?.item?.itemId },
+      { key: "spec", header: "Spec #", render: (r: any) => r?.item?.specNo },
+      {
+        key: "name",
+        header: "Item Name",
+        render: (r: any) => r?.item?.itemName,
+      },
+      {
+        key: "vendor",
+        header: "Vendor",
+        render: (r: any) => r?.vendor?.vendorName,
+      },
+      {
+        key: "shipTo",
+        header: "Ship To",
+        render: (r: any) => (
+          <div className="truncate max-w-[150px]">{r?.customer?.name}</div>
+        ),
+      },
+      { key: "quantity", header: "Qty" },
+      { key: "phase", header: "Phase" },
+      {
+        key: "price",
+        header: "Price",
+        render: (r: any) => r?.totalPrice / 100,
+      },
+      {
+        key: "shipNotes",
+        header: "Ship Notes",
+        render: (r: any) => (
+          <div className="truncate max-w-[150px]">
+            {r?.logistics?.shippingNotes}
+          </div>
+        ),
+      },
+    ],
+    []
+  );
 
   return (
     <div>
       <TableSearch
         vendors={vendors}
-        phase={phase}
+        phase={PHASES}
         onSearch={search}
         onReset={fetchAll}
         onExport={handleExport}
