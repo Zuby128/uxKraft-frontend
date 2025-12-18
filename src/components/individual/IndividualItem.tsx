@@ -12,6 +12,7 @@ import { memo, useRef } from "react";
 import { calculatePriceWithMarkupAndVAT } from "@/utils/price-with-markup";
 import { uploadFile } from "@/services/upload.service";
 import { toast } from "sonner";
+import formatPrice from "@/utils/format-price";
 
 function IndividualItem({ item }: { item: any }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -130,13 +131,15 @@ function IndividualItem({ item }: { item: any }) {
             <TableCell className="w-[200px] !text-wrap !line-clamp-2 ">
               {item?.item?.description ? item?.item?.description : "-"}
             </TableCell>
-            <TableCell>${item?.unitPrice / 100}</TableCell>
+            <TableCell>$ {formatPrice(item?.unitPrice / 100)}</TableCell>
             <TableCell>{item?.markupPercentage}%</TableCell>
             <TableCell>
               $
-              {calculatePriceWithMarkupAndVAT(
-                item?.unitPrice,
-                item?.markupPercentage
+              {formatPrice(
+                calculatePriceWithMarkupAndVAT(
+                  item?.unitPrice,
+                  item?.markupPercentage
+                )
               )}
             </TableCell>
             <TableCell>{item?.quantity}</TableCell>
@@ -144,7 +147,9 @@ function IndividualItem({ item }: { item: any }) {
           </TableRow>
         </TableBody>
       </Table>
-      <p className="text-end font-bold">Total: ${item?.totalPrice / 100}</p>
+      <p className="text-end font-bold">
+        Total: $ {formatPrice(item?.totalPrice / 100)}
+      </p>
     </div>
   );
 }

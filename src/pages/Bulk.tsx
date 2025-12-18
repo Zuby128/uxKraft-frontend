@@ -17,6 +17,7 @@ import { mapOrderItemsToCsv } from "@/utils/json-to-csv";
 import { toast } from "sonner";
 import Spinning from "@/components/common/Spinning";
 import { useGlobalLoading } from "@/hooks/useGlobalLoading";
+import formatPrice from "@/utils/format-price";
 
 const PHASES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
@@ -215,7 +216,7 @@ function Bulk() {
       {
         key: "price",
         header: "Price",
-        render: (r: any) => r?.totalPrice / 100,
+        render: (r: any) => <span>$ {formatPrice(r?.totalPrice / 100)}</span>,
       },
       {
         key: "shipNotes",
