@@ -1,4 +1,4 @@
-import { Download, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import {
   Table,
   TableBody,

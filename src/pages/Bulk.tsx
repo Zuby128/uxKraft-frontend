@@ -28,7 +28,6 @@ function Bulk() {
 
   const {
     items,
-    loading,
     fetchAll,
     search,
     mapObject,

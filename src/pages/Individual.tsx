@@ -19,7 +19,7 @@ function Individual() {
   const { openBar } = useRightSidebarStore();
   const { selectItem } = useOrderItemStore();
 
-  const { items, loading, search, fetchAll } = useOrderItemsStore();
+  const { items, search, fetchAll } = useOrderItemsStore();
   const { vendors } = useVendorsStore();
 
   useEffect(() => {
