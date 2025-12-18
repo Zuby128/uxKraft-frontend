@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useCallback, lazy, Suspense } from "react";
+import { useMemo, useCallback, lazy, Suspense } from "react";
 import { DataTable } from "@/components/common/DataTable";
 import { EditTable } from "@/components/common/EditTable";
 import TableSearch from "@/components/common/TableSearch";
