@@ -40,7 +40,7 @@ export default function Login() {
         toast("Login success");
         navigate("/");
       } catch (error) {
-        toast("Email or password is not verified");
+        toast("Email or password is invalid");
       }
     },
   });
