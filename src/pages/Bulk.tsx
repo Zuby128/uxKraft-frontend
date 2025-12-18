@@ -16,6 +16,7 @@ import { exportToCsv } from "@/utils/export-to-csv";
 import { mapOrderItemsToCsv } from "@/utils/json-to-csv";
 import { toast } from "sonner";
 import Spinning from "@/components/common/Spinning";
+import { useGlobalLoading } from "@/hooks/useGlobalLoading";
 
 const PHASES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
@@ -25,6 +26,7 @@ const UpdateTracking = lazy(() => import("@/components/bulk/UpdateTracking"));
 function Bulk() {
   const { openBar } = useRightSidebarStore();
   const { getState, reset } = useTimeline();
+  const { openLoading, closeLoading } = useGlobalLoading();
 
   const {
     items,
@@ -36,12 +38,21 @@ function Bulk() {
     updateList,
   } = useOrderItemsStore();
 
-  const { vendors, fetchVendors } = useVendorsStore();
+  const { vendors } = useVendorsStore();
 
   useEffect(() => {
-    fetchAll();
-    fetchVendors();
-  }, [fetchAll, fetchVendors]);
+    fetchIt();
+  }, [fetchAll]);
+
+  const fetchIt = () => {
+    try {
+      openLoading();
+      fetchAll();
+    } catch (error) {
+    } finally {
+      closeLoading();
+    }
+  };
 
   const handleExport = useCallback(() => {
     const csvData = mapOrderItemsToCsv(items);

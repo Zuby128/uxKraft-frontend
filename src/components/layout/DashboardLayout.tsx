@@ -4,6 +4,7 @@ import { AppSidebar } from "./AppSidebar";
 import { Toaster } from "sonner";
 import DashboardContent from "./DashboardContent";
 import { TimelineProvider } from "@/context/TimelineContext";
+import GlobalLoading from "../common/GlobalLoading";
 
 function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -18,6 +19,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
         </div>
         <RightSidebar />
         <Toaster />
+        <GlobalLoading />
       </TimelineProvider>
     </SidebarProvider>
   );

@@ -8,6 +8,7 @@ import { useOrderItemStore } from "@/store/order-item.store";
 import { exportToCsv } from "@/utils/export-to-csv";
 import { mapOrderItemsToCsv } from "@/utils/json-to-csv";
 import Spinning from "@/components/common/Spinning";
+import { useGlobalLoading } from "@/hooks/useGlobalLoading";
 
 const PHASES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
@@ -18,13 +19,23 @@ const IndividualItemDetails = lazy(
 function Individual() {
   const { openBar } = useRightSidebarStore();
   const { selectItem } = useOrderItemStore();
-
+  const { openLoading, closeLoading } = useGlobalLoading();
   const { items, search, fetchAll } = useOrderItemsStore();
   const { vendors } = useVendorsStore();
 
   useEffect(() => {
-    fetchAll();
+    fetchIt();
   }, [fetchAll]);
+
+  const fetchIt = () => {
+    try {
+      openLoading();
+      fetchAll();
+    } catch (error) {
+    } finally {
+      closeLoading();
+    }
+  };
 
   const handleExport = useCallback(() => {
     const csvData = mapOrderItemsToCsv(items);
