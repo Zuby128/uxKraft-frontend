@@ -36,9 +36,9 @@ function ProductionShop() {
           cfaShopsDelivered: data.cfaShopsDelivered,
         });
       }
-      toast("Plan Updated");
+      toast.success("Plan Updated");
     } catch (error) {
-      toast("Failed, please try again later");
+      toast.error("Failed, please try again later");
     }
   };
 

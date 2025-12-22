@@ -38,7 +38,7 @@ export function DataTable<TData extends { orderItemId: number }>({
   selectable = true,
   selectedElements,
 }: DataTableProps<TData>) {
-  /** selected orderItemId'ler */
+  /** selected orderItemIds */
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
 
   const [pageIndex, setPageIndex] = useState(0);

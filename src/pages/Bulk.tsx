@@ -69,7 +69,7 @@ function Bulk() {
 
   const onBulkEditAction = useCallback(async () => {
     if (!selectedItemIds.length) {
-      toast("No items selected");
+      toast.error("No items selected");
       return;
     }
 
@@ -106,16 +106,16 @@ function Bulk() {
         } as any);
       });
 
-      toast("Items Updated");
+      toast.success("Items Updated");
       reset();
     } catch {
-      toast("Items Not Updated, please try again later");
+      toast.error("Items Not Updated, please try again later");
     }
   }, [selectedItemIds, getState, updateList, reset]);
 
   const onEditItemAction = useCallback(async () => {
     if (!selectedItemIds.length) {
-      toast("No items selected");
+      toast.error("No items selected");
       return;
     }
 
@@ -131,7 +131,7 @@ function Bulk() {
     );
 
     if (!itemIds.length) {
-      toast("No valid items found");
+      toast.error("No valid items found");
       return;
     }
 
@@ -161,11 +161,11 @@ function Bulk() {
         } as any);
       });
 
-      toast("Items Updated");
+      toast.success("Items Updated");
       reset();
     } catch (error) {
       console.error(error);
-      toast("Items Not Updated, please try again later");
+      toast.error("Items Not Updated, please try again later");
     }
   }, [selectedItemIds, getState, mapObject, updateList, reset]);
 

@@ -32,9 +32,9 @@ function IndividualItem({ item }: { item: any }) {
 
       await uploadFile(item.orderItemId, formData);
 
-      toast("File Uploaded");
+      toast.success("File Uploaded");
     } catch (error) {
-      toast("File upload failed please try again later");
+      toast.error("File upload failed please try again later");
     }
   };
 

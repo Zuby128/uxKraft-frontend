@@ -37,10 +37,10 @@ export default function Login() {
     onSubmit: () => {
       try {
         login(formik.values);
-        toast("Login success");
+        toast.success("Login success");
         navigate("/");
       } catch (error) {
-        toast("Email or password is invalid");
+        toast.error("Email or password is invalid");
       }
     },
   });
