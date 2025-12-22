@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useCallback, lazy, Suspense } from "react";
+import { useMemo, useCallback, lazy, Suspense } from "react";
 import { DataTable } from "@/components/common/DataTable";
 import TableSearch from "@/components/common/TableSearch";
 import { useRightSidebarStore } from "@/store/RightSidebarStore";
@@ -20,23 +20,8 @@ const IndividualItemDetails = lazy(
 function Individual() {
   const { openBar } = useRightSidebarStore();
   const { selectItem } = useOrderItemStore();
-  const { openLoading, closeLoading } = useGlobalLoading();
   const { items, search, fetchAll } = useOrderItemsStore();
   const { vendors } = useVendorsStore();
-
-  useEffect(() => {
-    fetchIt();
-  }, [fetchAll]);
-
-  const fetchIt = () => {
-    try {
-      openLoading();
-      fetchAll();
-    } catch (error) {
-    } finally {
-      closeLoading();
-    }
-  };
 
   const handleExport = useCallback(() => {
     const csvData = mapOrderItemsToCsv(items);
