@@ -8,7 +8,6 @@ import { useOrderItemStore } from "@/store/order-item.store";
 import { exportToCsv } from "@/utils/export-to-csv";
 import { mapOrderItemsToCsv } from "@/utils/json-to-csv";
 import Spinning from "@/components/common/Spinning";
-import { useGlobalLoading } from "@/hooks/useGlobalLoading";
 import formatPrice from "@/utils/format-price";
 
 const PHASES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
