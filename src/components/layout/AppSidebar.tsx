@@ -19,12 +19,7 @@ const items = [
     icon: Database,
   },
   {
-    title: "Individual Operations",
-    url: "/dashboard/individual",
-    icon: Truck,
-  },
-  {
-    title: "Bulk Operations",
+    title: "Operations",
     url: "/dashboard/bulk",
     icon: Container,
   },

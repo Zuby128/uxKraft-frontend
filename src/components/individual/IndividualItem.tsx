@@ -46,7 +46,7 @@ function IndividualItem({ item }: { item: any }) {
           <TableRow className="border-none hover:bg-transparent">
             <TableCell className="p-0 py-4 w-1/3 align-top">
               <div className="text-gray-700 mb-2">Spec #</div>
-              <div>{item?.item?.specNo}</div>
+              <div>{item?.specNo}</div>
             </TableCell>
             <TableCell className="p-0 py-4 w-1/3 align-top">
               <div className="text-gray-700 mb-2">Vendor</div>
@@ -72,14 +72,14 @@ function IndividualItem({ item }: { item: any }) {
             <TableCell className="p-0 py-4 w-1/3 align-top">
               <div className="text-gray-700 mb-2">Ship From</div>
               <div className="font-bold w-full max-w-[150px] truncate">
-                {item?.item?.shipFrom}
+                {item?.shipFrom}
               </div>
               <div></div>
             </TableCell>
             <TableCell className="p-0 py-4 w-1/3 align-top">
               <div className="text-gray-700 mb-2">Notes for this item</div>
               <div className="font-bold max-w-[150px] truncate">
-                {item?.item?.notes}
+                {item?.notes}
               </div>
               <div></div>
             </TableCell>
@@ -89,11 +89,11 @@ function IndividualItem({ item }: { item: any }) {
           <TableRow className="border-none hover:bg-transparent">
             <TableCell className="p-0 py-4 w-1/3 align-top">
               <div className="text-gray-700 mb-2">Location</div>
-              <div className="font-bold">{item?.item?.location}</div>
+              <div className="font-bold">{item?.location}</div>
             </TableCell>
             <TableCell className="p-0 py-4 w-1/3 align-top">
               <div className="text-gray-700 mb-2">Category</div>
-              <div className="font-bold">{item?.item?.categoryId}</div>
+              <div className="font-bold">{item?.category?.name}</div>
             </TableCell>
             <TableCell className="p-0 py-4 w-1/3 align-top">
               <div className="text-gray-700 mb-2">Upload</div>
@@ -143,7 +143,7 @@ function IndividualItem({ item }: { item: any }) {
               )}
             </TableCell>
             <TableCell>{item?.quantity}</TableCell>
-            <TableCell>{item?.item?.unitType}</TableCell>
+            <TableCell>{item?.unitType}</TableCell>
           </TableRow>
         </TableBody>
       </Table>
