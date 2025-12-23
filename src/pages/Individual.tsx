@@ -118,7 +118,11 @@ function Individual() {
         onExport={handleExport}
       />
 
-      <DataTable columns={columns as any} data={items} selectable={false} />
+      <DataTable
+        columns={columns as any}
+        data={items as any}
+        selectable={false}
+      />
     </div>
   );
 }
