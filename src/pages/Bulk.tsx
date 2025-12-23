@@ -65,13 +65,6 @@ function Bulk() {
 
     const state = getState();
 
-    console.log(
-      "**********",
-      state.orderLogistics,
-      state.orderPlanning,
-      state.orderProduction
-    );
-
     try {
       await Promise.all([
         patchBulkOrderLogistics({
@@ -122,7 +115,7 @@ function Bulk() {
     const itemIds = Array.from(
       new Set(
         selectedItemIds
-          .map((id) => mapObject[id]?.item?.itemId)
+          .map((id) => mapObject[id]?.itemId)
           .filter((id): id is number => typeof id === "number")
       )
     );
@@ -141,21 +134,21 @@ function Bulk() {
         ...(bulkEdit.notes?.trim() && { notes: bulkEdit.notes }),
       });
 
-      selectedItemIds.forEach((orderItemId) => {
-        const currentItem = mapObject[orderItemId]?.item;
+      selectedItemIds.forEach((itemId) => {
+        const currentItem = mapObject[itemId];
+
+        console.log(currentItem);
         if (!currentItem) return;
 
-        updateList(orderItemId, {
-          item: {
-            ...currentItem,
-            ...(bulkEdit.categoryId != null && {
-              categoryId: bulkEdit.categoryId,
-            }),
-            ...(bulkEdit.location && { location: bulkEdit.location }),
-            ...(bulkEdit.shipFrom && { shipFrom: bulkEdit.shipFrom }),
-            ...(bulkEdit.notes && { notes: bulkEdit.notes }),
-          },
-        } as any);
+        updateList(itemId, {
+          ...currentItem,
+          ...(bulkEdit.categoryId != null && {
+            categoryId: bulkEdit.categoryId,
+          }),
+          ...(bulkEdit.location && { location: bulkEdit.location }),
+          ...(bulkEdit.shipFrom && { shipFrom: bulkEdit.shipFrom }),
+          ...(bulkEdit.notes && { notes: bulkEdit.notes }),
+        });
       });
 
       toast.success("Items Updated");
