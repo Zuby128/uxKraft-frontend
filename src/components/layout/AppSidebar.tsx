@@ -1,4 +1,4 @@
-import { Container, Database, Truck } from "lucide-react";
+import { Container, Database } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 import {
