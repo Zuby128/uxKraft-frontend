@@ -7,7 +7,7 @@ import type { OrderItem } from "@/types/order-item.type";
 
 const buildMap = (items: OrderItem[]) =>
   items.reduce((acc, item) => {
-    acc[item.orderItemId] = item;
+    acc[item.itemId] = item;
     return acc;
   }, {} as Record<number, OrderItem>);
 
@@ -103,7 +103,7 @@ export const useOrderItemsStore = create<OrderItemsState>((set) => ({
   updateList: (id, payload) => {
     set((state) => {
       const items = state.items.map((item) =>
-        item.orderItemId === id ? { ...item, ...payload } : item
+        item.itemId === id ? { ...item, ...payload } : item
       );
 
       return {

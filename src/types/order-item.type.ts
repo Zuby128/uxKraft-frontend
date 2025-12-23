@@ -1,7 +1,7 @@
 export type DateSectionKey =
-  | "planning"
-  | "production"
-  | "logistics"
+  | "orderPlanning"
+  | "orderProduction"
+  | "orderLogistics"
   | "item"
   | "vendor"
   | "customer"
@@ -48,7 +48,7 @@ interface Upload {
 
 interface Planning {
   planningId: number;
-  orderItemId: number;
+  itemId: number;
   poApprovalDate: string;
   hotelNeedByDate: string;
   expectedDelivery: string;
@@ -58,7 +58,7 @@ interface Planning {
 
 interface Production {
   productionId: number;
-  orderItemId: number;
+  itemId: number;
   cfaShopsSend: string;
   cfaShopsApproved: string;
   cfaShopsDelivered: string | null;
@@ -68,7 +68,7 @@ interface Production {
 
 interface Logistics {
   logisticsId: number;
-  orderItemId: number;
+  itemId: number;
   orderedDate: string;
   shippedDate: string;
   deliveredDate: string;
@@ -78,9 +78,8 @@ interface Logistics {
 }
 
 export interface OrderItem {
-  orderItemId: number;
-  vendorId: number;
   itemId: number;
+  vendorId: number;
   quantity: number;
   unitPrice: number;
   markupPercentage: string;
@@ -96,7 +95,7 @@ export interface OrderItem {
   vendor: Vendor;
   customer: Customer;
   uploads: Upload[];
-  planning: Planning;
-  production: Production;
-  logistics: Logistics;
+  orderPlanning: Planning;
+  orderProduction: Production;
+  orderLogistics: Logistics;
 }

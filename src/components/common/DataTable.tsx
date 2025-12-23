@@ -137,7 +137,7 @@ export function DataTable<TData extends { orderItemId: number }>({
           <TableBody>
             {paginatedData.length ? (
               paginatedData.map((row) => {
-                const rowId = row.orderItemId;
+                const rowId = (row as any)?.itemId;
                 const isSelected = selectedRows.has(rowId);
 
                 return (

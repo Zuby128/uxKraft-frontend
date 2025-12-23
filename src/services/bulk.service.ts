@@ -1,7 +1,7 @@
 import { api } from "@/lib/axiosinstance";
 
 export const patchBulkOrderPlanning = async (body: {
-  orderItemIds: number[];
+  itemIds: number[];
   poApprovalDate?: string;
   hotelNeedByDate?: string;
   expectedDelivery?: string;
@@ -12,7 +12,7 @@ export const patchBulkOrderPlanning = async (body: {
 };
 
 export const patchBulkOrderLogistics = async (body: {
-  orderItemIds: number[];
+  itemIds: number[];
   orderedDate?: string;
   shippedDate?: string;
   deliveredDate?: string | null;
@@ -23,7 +23,7 @@ export const patchBulkOrderLogistics = async (body: {
 };
 
 export const patchBulkOrderProduction = async (body: {
-  orderItemIds: number[];
+  itemIds: number[];
   cfaShopsSend?: string;
   cfaShopsApproved?: string;
   cfaShopsDelivered?: string | null;

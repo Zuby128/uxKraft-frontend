@@ -14,10 +14,10 @@ function UpdateTracking() {
         <div className="grid grid-cols-3 gap-4">
           <DatePickerField
             label="PO Approval Date"
-            value={state.planning.poApprovalDate as any}
+            value={state.orderPlanning.poApprovalDate as any}
             onChange={(date) =>
               updateField({
-                section: "planning",
+                section: "orderPlanning",
                 field: "poApprovalDate",
                 value: date,
               })
@@ -26,10 +26,10 @@ function UpdateTracking() {
 
           <DatePickerField
             label="Hotel Need By Date"
-            value={state.planning.hotelNeedByDate as any}
+            value={state.orderPlanning.hotelNeedByDate as any}
             onChange={(date) =>
               updateField({
-                section: "planning",
+                section: "orderPlanning",
                 field: "hotelNeedByDate",
                 value: date,
               })
@@ -38,10 +38,10 @@ function UpdateTracking() {
 
           <DatePickerField
             label="Expected Delivery"
-            value={state.planning.expectedDelivery as any}
+            value={state.orderPlanning.expectedDelivery as any}
             onChange={(date) =>
               updateField({
-                section: "planning",
+                section: "orderPlanning",
                 field: "expectedDelivery",
                 value: date,
               })
@@ -56,10 +56,10 @@ function UpdateTracking() {
         <div className="grid grid-cols-3 gap-4">
           <DatePickerField
             label="CFA/Shops Send"
-            value={state.production.cfaShopsSend as any}
+            value={state.orderProduction.cfaShopsSend as any}
             onChange={(date) =>
               updateField({
-                section: "production",
+                section: "orderProduction",
                 field: "cfaShopsSend",
                 value: date,
               })
@@ -68,10 +68,10 @@ function UpdateTracking() {
 
           <DatePickerField
             label="CFA/Shops Approved"
-            value={state.production.cfaShopsApproved as any}
+            value={state.orderProduction.cfaShopsApproved as any}
             onChange={(date) =>
               updateField({
-                section: "production",
+                section: "orderProduction",
                 field: "cfaShopsApproved",
                 value: date,
               })
@@ -80,10 +80,10 @@ function UpdateTracking() {
 
           <DatePickerField
             label="CFA/Shops Delivered"
-            value={state.production.cfaShopsDelivered as any}
+            value={state.orderProduction.cfaShopsDelivered as any}
             onChange={(date) =>
               updateField({
-                section: "production",
+                section: "orderProduction",
                 field: "cfaShopsDelivered",
                 value: date,
               })
@@ -98,10 +98,10 @@ function UpdateTracking() {
         <div className="grid grid-cols-3 gap-4">
           <DatePickerField
             label="Ordered Date"
-            value={state.logistics.orderedDate as any}
+            value={state.orderLogistics.orderedDate as any}
             onChange={(date) =>
               updateField({
-                section: "logistics",
+                section: "orderLogistics",
                 field: "orderedDate",
                 value: date,
               })
@@ -110,10 +110,10 @@ function UpdateTracking() {
 
           <DatePickerField
             label="Shipped Date"
-            value={state.logistics.shippedDate as any}
+            value={state.orderLogistics.shippedDate as any}
             onChange={(date) =>
               updateField({
-                section: "logistics",
+                section: "orderLogistics",
                 field: "shippedDate",
                 value: date,
               })
@@ -122,10 +122,10 @@ function UpdateTracking() {
 
           <DatePickerField
             label="Delivered Date"
-            value={state.logistics.deliveredDate as any}
+            value={state.orderLogistics.deliveredDate as any}
             onChange={(date) =>
               updateField({
-                section: "logistics",
+                section: "orderLogistics",
                 field: "deliveredDate",
                 value: date,
               })
@@ -138,10 +138,10 @@ function UpdateTracking() {
           <Textarea
             placeholder="Delicate product"
             rows={5}
-            value={state.logistics.shippingNotes}
+            value={state.orderLogistics.shippingNotes}
             onChange={(e) =>
               updateField({
-                section: "logistics",
+                section: "orderLogistics",
                 field: "shippingNotes",
                 value: e.target.value,
               })

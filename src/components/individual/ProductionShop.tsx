@@ -11,14 +11,14 @@ function ProductionShop() {
 
   const onUpdateProduction = async (date: any, title: string) => {
     try {
-      if (item?.production?.productionId) {
+      if (item?.orderProduction?.productionId) {
         const { data } = await patchOrderProduction(
-          item?.production?.productionId,
+          item?.orderProduction?.productionId,
           {
             [title]: date,
           }
         );
-        updateSection("production", {
+        updateSection("orderProduction", {
           productionId: data.productionId,
           cfaShopsSend: data.cfaShopsSend,
           cfaShopsApproved: data.cfaShopsApproved,
@@ -26,10 +26,10 @@ function ProductionShop() {
         });
       } else {
         const { data } = await createOrderProduction({
-          orderItemId: item?.orderItemId as any,
+          itemId: item?.itemId as any,
           [title]: date,
         });
-        updateSection("production", {
+        updateSection("orderProduction", {
           productionId: data.productionId,
           cfaShopsSend: data.cfaShopsSend,
           cfaShopsApproved: data.cfaShopsApproved,
@@ -48,19 +48,19 @@ function ProductionShop() {
       <div className="grid grid-cols-3 gap-4">
         <DatePickerField
           label={"CFA/Shops Send"}
-          value={(item?.production?.cfaShopsSend as any) ?? null}
+          value={(item?.orderProduction?.cfaShopsSend as any) ?? null}
           onChange={(date) => onUpdateProduction(date, "cfaShopsSend")}
         />
 
         <DatePickerField
           label={"CFA/Shops Approved"}
-          value={(item?.production?.cfaShopsApproved as any) ?? null}
+          value={(item?.orderProduction?.cfaShopsApproved as any) ?? null}
           onChange={(date) => onUpdateProduction(date, "cfaShopsApproved")}
         />
 
         <DatePickerField
           label={"CFA/Shops Delivered"}
-          value={(item?.production?.cfaShopsDelivered as any) ?? null}
+          value={(item?.orderProduction?.cfaShopsDelivered as any) ?? null}
           onChange={(date) => onUpdateProduction(date, "cfaShopsDelivered")}
         />
       </div>

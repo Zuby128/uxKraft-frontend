@@ -7,18 +7,18 @@ import React, {
 } from "react";
 
 type TimelineState = {
-  logistics: {
+  orderLogistics: {
     orderedDate?: Date | null;
     shippedDate?: Date | null;
     deliveredDate?: Date | null;
     shippingNotes?: string;
   };
-  planning: {
+  orderPlanning: {
     poApprovalDate?: Date | null;
     hotelNeedByDate?: Date | null;
     expectedDelivery?: Date | null;
   };
-  production: {
+  orderProduction: {
     cfaShopsSend?: Date | null;
     cfaShopsApproved?: Date | null;
     cfaShopsDelivered?: Date | null;
@@ -45,18 +45,18 @@ type TimelineContextValue = {
 };
 
 const defaultState: TimelineState = {
-  logistics: {
+  orderLogistics: {
     orderedDate: null,
     shippedDate: null,
     deliveredDate: null,
     shippingNotes: "",
   },
-  planning: {
+  orderPlanning: {
     poApprovalDate: null,
     hotelNeedByDate: null,
     expectedDelivery: null,
   },
-  production: {
+  orderProduction: {
     cfaShopsSend: null,
     cfaShopsApproved: null,
     cfaShopsDelivered: null,

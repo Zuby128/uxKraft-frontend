@@ -3,7 +3,7 @@ import { api } from "@/lib/axiosinstance";
 export const getOrderItems = async () => {
   try {
     const apix = await api();
-    const { data } = await apix.get("/order-items?includeRelations=true");
+    const { data } = await apix.get("/items?includeRelations=true");
     return data;
   } catch (error) {
     console.log(error);
@@ -39,9 +39,7 @@ export const getFilteredOrderItems = async (params: OrderItemSearchParams) => {
     safeAppend("phase", params.phase);
 
     const queryString = query.toString();
-    const url = queryString
-      ? `/order-items/search?${queryString}`
-      : `/order-items/search`;
+    const url = queryString ? `/items/search?${queryString}` : `/items/search`;
 
     const { data } = await apix.get(url);
     return data;

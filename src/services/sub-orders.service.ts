@@ -14,7 +14,7 @@ export const patchOrderPlanning = async (
 };
 
 export const createOrderPlanning = async (body: {
-  orderItemId: number;
+  itemId: number;
   poApprovalDate?: string;
   hotelNeedByDate?: string;
   expectedDelivery?: string;
@@ -38,7 +38,7 @@ export const patchOrderProduction = async (
 };
 
 export const createOrderProduction = async (body: {
-  orderItemId: number;
+  itemId: number;
   cfaShopsSend?: string;
   cfaShopsApproved?: string;
   cfaShopsDelivered?: string;
@@ -62,7 +62,7 @@ export const patchOrderLogistics = async (
 };
 
 export const createOrderLogistics = async (body: {
-  orderItemId: number;
+  itemId: number;
   orderedDate?: string;
   shippedDate?: string;
   deliveredDate?: string;

@@ -81,7 +81,9 @@ function Individual() {
         key: "shipTo",
         header: "Ship To",
         render: (row: any) => (
-          <div className="truncate max-w-[150px]">{row?.customer?.name}</div>
+          <div className="truncate max-w-[150px]">
+            {row?.customerAddress?.address}
+          </div>
         ),
       },
       { key: "quantity", header: "Qty" },

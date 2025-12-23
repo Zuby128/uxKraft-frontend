@@ -10,11 +10,14 @@ function PlanningRequirements() {
   const { item, updateSection } = useOrderItemStore();
   const onUpdatePlanning = async (date: any, title: string) => {
     try {
-      if (item?.planning?.planningId) {
-        const { data } = await patchOrderPlanning(item?.planning?.planningId, {
-          [title]: date,
-        });
-        updateSection("planning", {
+      if (item?.orderPlanning?.planningId) {
+        const { data } = await patchOrderPlanning(
+          item?.orderPlanning?.planningId,
+          {
+            [title]: date,
+          }
+        );
+        updateSection("orderPlanning", {
           planningId: data.planningId,
           poApprovalDate: data.poApprovalDate,
           hotelNeedByDate: data.hotelNeedByDate,
@@ -22,10 +25,10 @@ function PlanningRequirements() {
         });
       } else {
         const { data } = await createOrderPlanning({
-          orderItemId: item?.orderItemId as any,
+          itemId: item?.itemId as any,
           [title]: date,
         });
-        updateSection("planning", {
+        updateSection("orderPlanning", {
           planningId: data.planningId,
           poApprovalDate: data.poApprovalDate,
           hotelNeedByDate: data.hotelNeedByDate,
@@ -39,11 +42,18 @@ function PlanningRequirements() {
   };
 
   const getLateDays = (): number | null => {
-    if (!item?.planning?.expectedDelivery || !item?.planning?.hotelNeedByDate)
+    if (
+      !item?.orderPlanning?.expectedDelivery ||
+      !item?.orderPlanning?.hotelNeedByDate
+    )
       return null;
 
-    const expected = new Date(`${item?.planning?.expectedDelivery}T00:00:00Z`);
-    const needBy = new Date(`${item?.planning?.hotelNeedByDate}T00:00:00Z`);
+    const expected = new Date(
+      `${item?.orderPlanning?.expectedDelivery}T00:00:00Z`
+    );
+    const needBy = new Date(
+      `${item?.orderPlanning?.hotelNeedByDate}T00:00:00Z`
+    );
 
     const diffMs = expected.getTime() - needBy.getTime();
     const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
@@ -57,19 +67,19 @@ function PlanningRequirements() {
       <div className="grid grid-cols-3 gap-4 relative">
         <DatePickerField
           label={"PO Approval Date"}
-          value={(item?.planning?.poApprovalDate as any) ?? null}
+          value={(item?.orderPlanning?.poApprovalDate as any) ?? null}
           onChange={(date) => onUpdatePlanning(date, "poApprovalDate")}
         />
 
         <DatePickerField
           label={"Hotel Need by Date"}
-          value={(item?.planning?.hotelNeedByDate as any) ?? null}
+          value={(item?.orderPlanning?.hotelNeedByDate as any) ?? null}
           onChange={(date) => onUpdatePlanning(date, "hotelNeedByDate")}
         />
 
         <DatePickerField
           label={"Expected Delivery"}
-          value={(item?.planning?.expectedDelivery as any) ?? null}
+          value={(item?.orderPlanning?.expectedDelivery as any) ?? null}
           onChange={(date) => onUpdatePlanning(date, "expectedDelivery")}
         />
 

@@ -17,11 +17,15 @@ import { mapOrderItemsToCsv } from "@/utils/json-to-csv";
 import { toast } from "sonner";
 import Spinning from "@/components/common/Spinning";
 import formatPrice from "@/utils/format-price";
+import { useOrderItemStore } from "@/store/order-item.store";
 
 const PHASES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
 const BulkEdit = lazy(() => import("@/components/bulk/BulkEdit"));
 const UpdateTracking = lazy(() => import("@/components/bulk/UpdateTracking"));
+const IndividualItemDetails = lazy(
+  () => import("@/components/individual/IndividualItemDetails")
+);
 
 function Bulk() {
   const { openBar } = useRightSidebarStore();
@@ -38,6 +42,8 @@ function Bulk() {
   } = useOrderItemsStore();
 
   const { vendors } = useVendorsStore();
+
+  const { selectItem } = useOrderItemStore();
 
   const handleExport = useCallback(() => {
     const csvData = mapOrderItemsToCsv(items);
@@ -59,34 +65,41 @@ function Bulk() {
 
     const state = getState();
 
+    console.log(
+      "**********",
+      state.orderLogistics,
+      state.orderPlanning,
+      state.orderProduction
+    );
+
     try {
       await Promise.all([
         patchBulkOrderLogistics({
-          orderItemIds: selectedItemIds,
-          orderedDate: state.logistics.orderedDate as any,
-          shippedDate: state.logistics.shippedDate as any,
-          deliveredDate: state.logistics.deliveredDate as any,
-          shippingNotes: state.logistics.shippingNotes as any,
+          itemIds: selectedItemIds,
+          orderedDate: state.orderLogistics.orderedDate as any,
+          shippedDate: state.orderLogistics.shippedDate as any,
+          deliveredDate: state.orderLogistics.deliveredDate as any,
+          shippingNotes: state.orderLogistics.shippingNotes as any,
         }),
         patchBulkOrderPlanning({
-          orderItemIds: selectedItemIds,
-          poApprovalDate: state.planning.poApprovalDate as any,
-          hotelNeedByDate: state.planning.hotelNeedByDate as any,
-          expectedDelivery: state.planning.expectedDelivery as any,
+          itemIds: selectedItemIds,
+          poApprovalDate: state.orderPlanning.poApprovalDate as any,
+          hotelNeedByDate: state.orderPlanning.hotelNeedByDate as any,
+          expectedDelivery: state.orderPlanning.expectedDelivery as any,
         }),
         patchBulkOrderProduction({
-          orderItemIds: selectedItemIds,
-          cfaShopsSend: state.production.cfaShopsSend as any,
-          cfaShopsApproved: state.production.cfaShopsApproved as any,
-          cfaShopsDelivered: state.production.cfaShopsDelivered as any,
+          itemIds: selectedItemIds,
+          cfaShopsSend: state.orderProduction.cfaShopsSend as any,
+          cfaShopsApproved: state.orderProduction.cfaShopsApproved as any,
+          cfaShopsDelivered: state.orderProduction.cfaShopsDelivered as any,
         }),
       ]);
 
       selectedItemIds.forEach((orderItemId) => {
         updateList(orderItemId, {
-          logistics: state.logistics,
-          planning: state.planning,
-          production: state.production,
+          logistics: state.orderLogistics,
+          planning: state.orderPlanning,
+          production: state.orderProduction,
         } as any);
       });
 
@@ -173,15 +186,41 @@ function Bulk() {
     [openBar, selectedItemIds.length, onEditItemAction]
   );
 
+  const onOpenSideBar = useCallback(
+    (row: any) => {
+      if (!row) return;
+
+      selectItem(row);
+
+      openBar(
+        <>
+          {row?.item?.itemName} #{row?.itemId}
+          <span className="text-sm underline ml-4">Edit</span>
+        </>,
+        <Suspense fallback={<Spinning />}>
+          <IndividualItemDetails />
+        </Suspense>
+      );
+    },
+    [openBar, selectItem]
+  );
+
   const columns = useMemo(
     () => [
-      { key: "orderItemId", header: "Order #" },
-      { key: "item", header: "Item #", render: (r: any) => r?.item?.itemId },
-      { key: "spec", header: "Spec #", render: (r: any) => r?.item?.specNo },
+      { key: "item", header: "Item #", render: (r: any) => r?.itemId },
+      { key: "spec", header: "Spec #", render: (r: any) => r?.specNo },
       {
         key: "name",
         header: "Item Name",
-        render: (r: any) => r?.item?.itemName,
+        render: (row: any) => (
+          <button
+            type="button"
+            className="text-primary cursor-pointer text-left"
+            onClick={() => onOpenSideBar(row)}
+          >
+            {row?.itemName}
+          </button>
+        ),
       },
       {
         key: "vendor",
@@ -207,7 +246,7 @@ function Bulk() {
         header: "Ship Notes",
         render: (r: any) => (
           <div className="truncate max-w-[150px]">
-            {r?.logistics?.shippingNotes}
+            {r?.orderLogistics?.shippingNotes}
           </div>
         ),
       },
@@ -248,7 +287,7 @@ function Bulk() {
 
       <DataTable
         columns={columns as any}
-        data={items}
+        data={items as any}
         selectable
         selectedElements={onSelectedElements}
       />

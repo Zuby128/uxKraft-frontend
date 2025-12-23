@@ -11,18 +11,18 @@ import { useState } from "react";
 
 function Shipping() {
   const { item, updateSection } = useOrderItemStore();
-  const [input, setInput] = useState(item?.logistics?.shippingNotes || "");
+  const [input, setInput] = useState(item?.orderLogistics?.shippingNotes || "");
 
   const onUpdatePlanning = async (date: any, title: string) => {
     try {
-      if (item?.logistics?.logisticsId) {
+      if (item?.orderLogistics?.logisticsId) {
         const { data } = await patchOrderLogistics(
-          item?.logistics?.logisticsId,
+          item?.orderLogistics?.logisticsId,
           {
             [title]: date,
           }
         );
-        updateSection("logistics", {
+        updateSection("orderLogistics", {
           logisticsId: data?.logisticsId,
           orderedDate: data?.orderedDate,
           deliveredDate: data?.deliveredDate,
@@ -31,10 +31,10 @@ function Shipping() {
         });
       } else {
         const { data } = await createOrderLogistics({
-          orderItemId: item?.orderItemId as any,
+          itemId: item?.itemId as any,
           [title]: date,
         });
-        updateSection("logistics", {
+        updateSection("orderLogistics", {
           logisticsId: data?.logisticsId,
           orderedDate: data?.orderedDate,
           deliveredDate: data?.deliveredDate,
@@ -49,29 +49,29 @@ function Shipping() {
   };
 
   const handleBlur = async () => {
-    if (input === item?.logistics?.shippingNotes) return;
+    if (input === item?.orderLogistics?.shippingNotes) return;
 
     try {
-      updateSection("logistics", {
+      updateSection("orderLogistics", {
         shippingNotes: input,
       });
 
-      if (item?.logistics?.logisticsId) {
+      if (item?.orderLogistics?.logisticsId) {
         const { data } = await patchOrderLogistics(
-          item?.logistics?.logisticsId,
+          item?.orderLogistics?.logisticsId,
           {
             shippingNotes: input,
           }
         );
-        updateSection("logistics", {
+        updateSection("orderLogistics", {
           shippingNotes: data?.shippingNotes,
         });
       } else {
         const { data } = await createOrderLogistics({
-          orderItemId: item?.orderItemId as any,
+          itemId: item?.itemId as any,
           shippingNotes: input,
         });
-        updateSection("logistics", {
+        updateSection("orderLogistics", {
           logisticsId: data?.logisticsId,
           orderedDate: data?.orderedDate,
           deliveredDate: data?.deliveredDate,
@@ -91,17 +91,17 @@ function Shipping() {
       <div className="grid grid-cols-3 gap-4 relative">
         <DatePickerField
           label={"Ordered Date"}
-          value={(item?.logistics?.orderedDate as any) ?? null}
+          value={(item?.orderLogistics?.orderedDate as any) ?? null}
           onChange={(date) => onUpdatePlanning(date, "orderedDate")}
         />
         <DatePickerField
           label={"Shipped Date"}
-          value={(item?.logistics?.shippedDate as any) ?? null}
+          value={(item?.orderLogistics?.shippedDate as any) ?? null}
           onChange={(date) => onUpdatePlanning(date, "shippedDate")}
         />
         <DatePickerField
           label={"Delivered Date"}
-          value={(item?.logistics?.deliveredDate as any) ?? null}
+          value={(item?.orderLogistics?.deliveredDate as any) ?? null}
           onChange={(date) => onUpdatePlanning(date, "deliveredDate")}
         />
       </div>

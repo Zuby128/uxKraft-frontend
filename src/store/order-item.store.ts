@@ -36,6 +36,6 @@ export const useOrderItemStore = create<OrderItemState>((set, get) => ({
 
     set({ item: updatedItem });
 
-    useOrderItemsStore.getState().updateList(item.orderItemId, updatedItem);
+    useOrderItemsStore.getState().updateList(item.itemId, updatedItem);
   },
 }));
