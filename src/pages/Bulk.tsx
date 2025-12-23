@@ -97,9 +97,9 @@ function Bulk() {
 
       selectedItemIds.forEach((orderItemId) => {
         updateList(orderItemId, {
-          logistics: state.orderLogistics,
-          planning: state.orderPlanning,
-          production: state.orderProduction,
+          orderLogistics: state.orderLogistics,
+          orderPlanning: state.orderPlanning,
+          orderProduction: state.orderProduction,
         } as any);
       });
 
