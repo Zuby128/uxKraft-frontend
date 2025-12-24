@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import Spinning from "@/components/common/Spinning";
 import formatPrice from "@/utils/format-price";
 import { useOrderItemStore } from "@/store/order-item.store";
+import { useCategoriesStore } from "@/store/categoriesStore";
 
 const PHASES = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
@@ -42,6 +43,7 @@ function Bulk() {
   } = useOrderItemsStore();
 
   const { vendors } = useVendorsStore();
+  const { categories } = useCategoriesStore();
 
   const { selectItem } = useOrderItemStore();
 
@@ -137,11 +139,17 @@ function Bulk() {
       selectedItemIds.forEach((itemId) => {
         const currentItem = mapObject[itemId];
 
-        console.log(currentItem);
         if (!currentItem) return;
+
+        const newCat = categories.find(
+          (cat) => cat.categoryId === bulkEdit.categoryId
+        );
 
         updateList(itemId, {
           ...currentItem,
+          ...(bulkEdit.categoryId != null && {
+            category: newCat,
+          }),
           ...(bulkEdit.categoryId != null && {
             categoryId: bulkEdit.categoryId,
           }),

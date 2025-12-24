@@ -106,8 +106,6 @@ export const useOrderItemsStore = create<OrderItemsState>((set) => ({
         item.itemId === id ? { ...item, ...payload } : item
       );
 
-      console.log("iiiiiiiiiii", payload);
-
       return {
         items,
         mapObject: buildMap(items),
